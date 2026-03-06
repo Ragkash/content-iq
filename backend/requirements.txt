@@ -1,0 +1,34 @@
+# ────────────────────────────────────
+# Content IQ — Backend Dependencies
+# Install: pip install -r requirements.txt
+# ────────────────────────────────────
+
+# API Framework
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0
+python-multipart>=0.0.9
+
+# Azure AI Services
+openai>=1.30.0
+azure-search-documents>=11.6.0
+azure-storage-blob>=12.20.0
+azure-identity>=1.16.0
+
+# Semantic Kernel (agent/orchestration framework)
+semantic-kernel>=1.5.0
+
+# Tokenisation (for chunking)
+tiktoken>=0.7.0
+
+# HTTP client (Content Understanding REST calls, Bing API)
+httpx>=0.27.0
+
+# Env / config
+python-dotenv>=1.0.0
+
+# Data handling
+pydantic>=2.7.0
+
+# Utilities
+tenacity>=8.3.0     # retry with exponential backoff
+rich>=13.7.0        # pretty CLI logging for ingestion scripts
