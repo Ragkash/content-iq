@@ -118,7 +118,7 @@ contentiq/
 | `AZURE_SEARCH_INDEX_NAME` | Index name (default: `content-iq-index`) |
 | `AZURE_CU_ENDPOINT` | Azure Content Understanding endpoint |
 | `AZURE_CU_KEY` | Azure Content Understanding key |
-| `AZURE_STORAGE_CONNECTION_STRING` | Blob Storage connection string |
+| `AZURE_STORAGE_ACCOUNT_NAME` | Blob Storage account name (e.g. `mycompanydocs`). Auth via Managed Identity — shared key access is disabled. |
 | `AZURE_STORAGE_CONTAINER` | Container name (default: `documents`) |
 | `BING_API_KEY` | Bing Search v7 API key |
 | `CONFIDENCE_THRESHOLD` | Min score before Bing fallback (default: `0.6`) |

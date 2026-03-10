@@ -22,7 +22,7 @@ import logging
 import os
 import sys
 
-from azure.core.credentials import AzureKeyCredential
+from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
 from dotenv import load_dotenv
 from rich.console import Console
@@ -48,49 +48,35 @@ from ingestion.analyzer import analyze_document
 from ingestion.chunker import chunk_document
 from ingestion.uploader import upload_chunks
 
-STORAGE_CONNECTION_STRING = os.getenv("AZURE_STORAGE_CONNECTION_STRING", "")
+STORAGE_ACCOUNT_NAME = os.getenv("AZURE_STORAGE_ACCOUNT_NAME", "")
 CONTAINER_NAME = os.getenv("AZURE_STORAGE_CONTAINER", "documents")
 
 
-def list_blob_files() -> list[dict]:
-    """List all files in the Blob container with their name and SAS URL."""
-    if not STORAGE_CONNECTION_STRING:
-        raise EnvironmentError("AZURE_STORAGE_CONNECTION_STRING must be set in .env")
+def _get_blob_service_client() -> BlobServiceClient:
+    """
+    Return a BlobServiceClient authenticated via Managed Identity (or az login locally).
+    Shared key access is disabled on this subscription — no connection strings or SAS tokens.
+    Content Understanding is granted Storage Blob Data Reader via IAM and fetches blob URLs directly.
+    """
+    if not STORAGE_ACCOUNT_NAME:
+        raise EnvironmentError("AZURE_STORAGE_ACCOUNT_NAME must be set in .env")
+    account_url = f"https://{STORAGE_ACCOUNT_NAME}.blob.core.windows.net"
+    return BlobServiceClient(account_url=account_url, credential=DefaultAzureCredential())
 
-    client = BlobServiceClient.from_connection_string(STORAGE_CONNECTION_STRING)
+
+def list_blob_files() -> list[dict]:
+    """List all files in the Blob container with their blob URL and path."""
+    client = _get_blob_service_client()
     container = client.get_container_client(CONTAINER_NAME)
 
     files = []
     for blob in container.list_blobs():
         blob_client = container.get_blob_client(blob.name)
-
-        # blob.name  = path within container, e.g. "customers/Shell/file.pdf"
-        #              This is what gets passed as file_path → used for customer_tag extraction
-        # blob_client.url = full URL e.g. "https://<account>.blob.core.windows.net/<container>/customers/Shell/file.pdf"
-        #                   This is sent to CU as the document URL and stored as source_url in the index.
-        #
-        # TODO: For private containers (recommended for enterprise data), blob_client.url
-        # does NOT include auth. Content Understanding will receive a 403 when it tries to
-        # fetch the document. Fix before running P3:
-        #
-        # Option A — generate a short-lived SAS token:
-        #   from azure.storage.blob import generate_blob_sas, BlobSasPermissions
-        #   from datetime import timedelta
-        #   account_key = client.credential.account_key  # extracted from connection string
-        #   sas = generate_blob_sas(
-        #       account_name=blob_client.account_name,
-        #       container_name=CONTAINER_NAME,
-        #       blob_name=blob.name,
-        #       account_key=account_key,
-        #       permission=BlobSasPermissions(read=True),
-        #       expiry=datetime.utcnow() + timedelta(hours=2),
-        #   )
-        #   blob_url = f"{blob_client.url}?{sas}"
-        #
-        # Option B — set the container to allow CU's managed identity
-        #            via Azure portal → Storage Account → Access Control (IAM)
-        #
-        # For now, blob_client.url works if the container is set to public read (dev only).
+        # blob.name     = path within container, e.g. "customers/Shell/file.pdf"
+        #                 Passed as file_path → used for customer_tag extraction
+        # blob_client.url = "https://<account>.blob.core.windows.net/<container>/customers/Shell/file.pdf"
+        #                   Sent to CU as the document URL and stored as source_url in the index.
+        #                   CU accesses it using its own Managed Identity (Storage Blob Data Reader on IAM).
         files.append({
             "file_path": blob.name,
             "blob_url": blob_client.url,
@@ -171,7 +157,7 @@ def main():
     # List blobs
     if args.file:
         # Single-file mode: construct blob info manually
-        client = BlobServiceClient.from_connection_string(STORAGE_CONNECTION_STRING)
+        client = _get_blob_service_client()
         blob_client = client.get_container_client(CONTAINER_NAME).get_blob_client(args.file)
         blobs = [{"file_path": args.file, "blob_url": blob_client.url, "last_modified": None}]
     else:
