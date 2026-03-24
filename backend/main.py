@@ -73,6 +73,14 @@ class ChatRequest(BaseModel):
         default=None,
         description="Azure AD token (v1: accepted but not validated). Required in v2.",
     )
+    web_search_enabled: bool = Field(
+        default=False,
+        description="Toggle ON — run hybrid internal + Tavily search.",
+    )
+    web_only: bool = Field(
+        default=False,
+        description="One-time consent — skip internal (already failed) and go straight to Tavily.",
+    )
 
 
 class CitationResponse(BaseModel):
@@ -90,6 +98,7 @@ class ChatResponse(BaseModel):
     citations: list[CitationResponse]
     source_label: str               # "INTERNAL" or "WEB"
     conversation_id: str
+    needs_web_permission: bool = False
 
 
 # ── Endpoints ─────────────────────────────────────────────────────────────────
@@ -114,6 +123,8 @@ async def chat(request: ChatRequest) -> Any:
             user_message=request.message,
             conversation_id=request.conversation_id,
             auth_token=request.auth_token,
+            web_search_enabled=request.web_search_enabled,
+            web_only=request.web_only,
         )
     except EnvironmentError as e:
         # Missing Azure credentials — give a helpful error during development
@@ -144,6 +155,7 @@ async def chat(request: ChatRequest) -> Any:
         ],
         source_label=result["source_label"],
         conversation_id=request.conversation_id,
+        needs_web_permission=result.get("needs_web_permission", False),
     )
 
 

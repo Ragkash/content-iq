@@ -1,12 +1,9 @@
 /**
  * ContentIQ Chat API adapter
  * Connects the React frontend to the FastAPI backend at /chat.
- *
- * This replaces the demo's api.ts with a simpler, ContentIQ-specific
- * schema that maps to our { answer, citations, source_label } response.
  */
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "";
 
 export interface Citation {
     document_title: string;
@@ -23,6 +20,8 @@ export interface ChatResponse {
     citations: Citation[];
     source_label: "INTERNAL" | "WEB";
     conversation_id: string;
+    /** True when internal confidence is low — frontend should show a one-time web search consent prompt. */
+    needs_web_permission?: boolean;
 }
 
 export interface ChatMessage {
@@ -31,27 +30,32 @@ export interface ChatMessage {
     citations?: Citation[];
     source_label?: "INTERNAL" | "WEB";
     timestamp: number;
+    /** "permission_request" renders a one-time web search consent card instead of a normal answer. */
+    type?: "permission_request";
 }
 
 /**
  * Send a chat message to the ContentIQ FastAPI backend.
  *
- * @param message         The user's query
- * @param conversationId  UUID maintained by the frontend across turns
- * @returns               ChatResponse with answer + citations + source_label
+ * @param message           The user's query
+ * @param conversationId    UUID maintained by the frontend across turns
+ * @param webSearchEnabled  When true, backend skips internal search and queries Tavily.
+ *                          Set either by the persistent toggle OR by one-time user consent.
  */
 export async function sendChatMessage(
     message: string,
-    conversationId: string
+    conversationId: string,
+    webSearchEnabled: boolean = false,
+    webOnly: boolean = false,
 ): Promise<ChatResponse> {
     const response = await fetch(`${BACKEND_URL}/chat`, {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             message,
             conversation_id: conversationId,
+            web_search_enabled: webSearchEnabled,
+            web_only: webOnly,
         }),
     });
 
@@ -66,8 +70,7 @@ export async function sendChatMessage(
         throw new Error(`ContentIQ backend error: ${errorDetail}`);
     }
 
-    const data: ChatResponse = await response.json();
-    return data;
+    return response.json() as Promise<ChatResponse>;
 }
 
 /**

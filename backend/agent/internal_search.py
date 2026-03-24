@@ -49,8 +49,9 @@ def _build_filter(metadata_filters: dict[str, Any]) -> str | None:
     clauses = []
     customer = metadata_filters.get("customer_tag")
     if customer:
-        # Escape single quotes per OData spec
-        safe_customer = customer.replace("'", "''")
+        # Normalize to match how customer_tag is stored (folder name: lowercase, spaces→underscores)
+        # e.g. "Air India" → "air_india", "IndiGo" → "indigo"
+        safe_customer = customer.lower().replace(" ", "_").replace("'", "''")
         clauses.append(f"customer_tag eq '{safe_customer}'")
 
     content_type = metadata_filters.get("content_type")
@@ -115,18 +116,23 @@ def search(
     }
     if odata_filter:
         search_kwargs["filter"] = odata_filter
-    if sort_by:
-        search_kwargs["order_by"] = [sort_by]
+    # order_by is not supported when query_type="semantic"; ignore sort requests
 
+    seen_ids: set[str] = set()
     results = []
     for item in client.search(**search_kwargs):
+        doc_id = item.get("id", "")
+        if doc_id and doc_id in seen_ids:
+            continue
+        if doc_id:
+            seen_ids.add(doc_id)
         result = dict(item)
         # Ensure score fields are present for ConfidenceEvaluator
         result["@search.score"] = item.get("@search.score", 0.0)
         result["@search.reranker_score"] = item.get("@search.reranker_score", 0.0)
         results.append(result)
 
-    logger.info("InternalSearchTool returned %d results.", len(results))
+    logger.info("InternalSearchTool returned %d results (deduplicated).", len(results))
     return results
 
 

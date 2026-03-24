@@ -47,3 +47,12 @@ logs/
 # Temp / scratch
 tmp/
 scratch/
+
+# AI memory (local only)
+.claude/
+
+# Pip install artifacts
+=*
+
+# Azure Content Understanding cache
+backend/.cu_cache/

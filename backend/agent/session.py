@@ -77,27 +77,34 @@ class SessionStore:
         if len(session.history) > 20:
             session.history = session.history[-20:]
 
+    # Pronouns and short phrases that signal the user is referring back to the
+    # last answer rather than asking a new question.
+    _FOLLOWUP_SIGNALS = frozenset([
+        "that", "this", "it", "they", "them", "those", "these",
+        "he", "she", "who", "which", "what about", "tell me more",
+        "explain", "elaborate", "summarise", "summarize", "expand",
+        "why", "how so", "go on", "continue",
+    ])
+
     def is_followup(
         self,
         new_entities: dict[str, Any],
         conversation_id: str,
+        user_message: str = "",
     ) -> bool:
         """
-        Determine whether the new query is a follow-up in the same context.
+        Determine whether the new query is a follow-up that can be answered
+        from the session's cached chunks without a new retrieval call.
 
-        A query is a follow-up when:
-        1. The session has previously retrieved chunks, AND
-        2. No NEW customer entity is introduced (same or no customer)
+        A query is a follow-up when ALL of the following are true:
+        1. The session has previously retrieved chunks.
+        2. No new customer entity is introduced (same customer or none).
+        3. The query looks like a refinement: it is short (≤ 8 words) OR
+           starts with a pronoun/reference word that points back to prior context.
 
-        This prevents unnecessarily re-running retrieval for questions like
-        "Who wrote that?" when we already have Shell proposals in session.
-
-        Args:
-            new_entities:      Parsed entities from the new user query.
-            conversation_id:   The active conversation ID.
-
-        Returns:
-            True if this should be answered from session cache.
+        The word-count + signal check prevents long, substantively different
+        questions (e.g. "what % is it for Australia specifically") from
+        incorrectly reusing stale chunks that don't contain the answer.
         """
         session = self.get(conversation_id)
 
@@ -108,7 +115,7 @@ class SessionStore:
         new_customer = (new_entities.get("customer") or "").lower()
         last_customer = (session.last_entities.get("customer") or "").lower()
 
-        # If user asks about a different customer → fresh retrieval
+        # Different customer → fresh retrieval
         if new_customer and last_customer and new_customer != last_customer:
             logger.info(
                 "Session[%s] → NEW RETRIEVAL: customer changed '%s' → '%s'",
@@ -116,11 +123,27 @@ class SessionStore:
             )
             return False
 
-        # If user introduces a customer entity for the first time → fresh retrieval
+        # New customer introduced for first time → fresh retrieval
         if new_customer and not last_customer:
             logger.info(
                 "Session[%s] → NEW RETRIEVAL: new customer entity '%s' introduced.",
                 conversation_id, new_customer
+            )
+            return False
+
+        # Check whether the message looks like a genuine follow-up refinement
+        words = user_message.lower().split()
+        is_short = len(words) <= 8
+        starts_with_signal = bool(words) and any(
+            user_message.lower().startswith(signal)
+            for signal in self._FOLLOWUP_SIGNALS
+        )
+
+        if not (is_short or starts_with_signal):
+            logger.info(
+                "Session[%s] → NEW RETRIEVAL: message is substantive (%d words, "
+                "no follow-up signal).",
+                conversation_id, len(words)
             )
             return False
 

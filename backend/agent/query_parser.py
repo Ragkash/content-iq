@@ -1,6 +1,6 @@
 """
 ContentIQ — Agent: Query Parser
-Uses GPT-4o to extract structured intent, entities, and metadata filters
+Uses Groq (llama-3.3-70b) to extract structured intent, entities, and metadata filters
 from a natural-language user query.
 """
 
@@ -9,26 +9,23 @@ import json
 import logging
 from typing import Any
 
-from openai import AzureOpenAI
 from dotenv import load_dotenv
+
+from agent.groq_client import chat_completion, GROQ_MODEL
 
 load_dotenv()
 logger = logging.getLogger(__name__)
 
-AZURE_OPENAI_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT", "")
-AZURE_OPENAI_KEY = os.getenv("AZURE_OPENAI_KEY", "")
-CHAT_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT", "gpt-4o")
-
 PARSE_SYSTEM_PROMPT = """
-You are a query understanding assistant for an enterprise document search system.
+You are a query understanding assistant for an enterprise document search system used by a consulting firm.
 Extract structured information from the user's query and return a JSON object.
 
 Return ONLY valid JSON with these exact keys:
 {
   "intent": one of ["find_documents", "get_metadata", "explain_content", "general"],
   "entities": {
-    "customer": string or null,    // e.g. "Shell", "BP"
-    "topic": string or null        // e.g. "cloud migration", "revenue chart"
+    "customer": string or null,    // The consulting firm's direct CLIENT (e.g. "Shell", "IndiGo", "Air India", "OpenAI")
+    "topic": string or null        // e.g. "cloud migration", "revenue chart", "AI adoption"
   },
   "time_constraint": "recent" | "oldest" | null,
   "metadata_filters": {
@@ -38,31 +35,18 @@ Return ONLY valid JSON with these exact keys:
   }
 }
 
-Rules:
+CRITICAL Rules:
+- customer / customer_tag ONLY refers to the consulting firm's direct CLIENT whose folder the document lives in (e.g. Shell, IndiGo, Air India, OpenAI).
+  - Set customer_tag ONLY when the user explicitly says "our [client]", "we presented to [client]", "the [client] proposal/deck/report", or similar phrasing that indicates the document BELONGS TO a client.
+  - Do NOT set customer_tag for companies that merely APPEAR IN a document as case study subjects, examples, or references (e.g. Intercom, BBVA, Lowe's, Oscar Health, Moderna, McKinsey, Gartner, etc.).
+  - If unsure whether a company is a direct client or just mentioned in a document, set customer_tag to null.
 - "recent" time_constraint → set sort to "last_modified_date desc"
-- If a specific customer is mentioned (Shell, BP, etc.) → set customer_tag
 - Chart/revenue/graph questions → set content_type to "chart"
-- Questions about who wrote something → intent is "get_metadata"
+- Questions about who wrote/authored something → intent is "get_metadata"
 - Return null for any field you cannot confidently determine
 """.strip()
 
 
-_client: AzureOpenAI | None = None
-
-
-def _get_client() -> AzureOpenAI:
-    global _client
-    if _client is None:
-        if not AZURE_OPENAI_ENDPOINT or not AZURE_OPENAI_KEY:
-            raise EnvironmentError(
-                "AZURE_OPENAI_ENDPOINT and AZURE_OPENAI_KEY must be set in .env"
-            )
-        _client = AzureOpenAI(
-            api_key=AZURE_OPENAI_KEY,
-            azure_endpoint=AZURE_OPENAI_ENDPOINT,
-            api_version="2024-02-01",
-        )
-    return _client
 
 
 def parse_query(
@@ -80,8 +64,6 @@ def parse_query(
         dict with keys: intent, entities, time_constraint, metadata_filters
         Falls back to a safe default dict if GPT-4o returns invalid JSON.
     """
-    client = _get_client()
-
     # Build messages: include last 4 turns of history for context
     messages: list[dict[str, str]] = [
         {"role": "system", "content": PARSE_SYSTEM_PROMPT}
@@ -91,9 +73,9 @@ def parse_query(
     messages.append({"role": "user", "content": user_message})
 
     try:
-        response = client.chat.completions.create(
-            model=CHAT_DEPLOYMENT,
-            messages=messages,  # type: ignore[arg-type]
+        response = chat_completion(
+            messages=messages,
+            model=GROQ_MODEL,
             temperature=0.0,    # deterministic parsing
             max_tokens=400,
             response_format={"type": "json_object"},

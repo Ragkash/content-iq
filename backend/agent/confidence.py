@@ -13,7 +13,11 @@ from dotenv import load_dotenv
 load_dotenv()
 logger = logging.getLogger(__name__)
 
-CONFIDENCE_THRESHOLD = float(os.getenv("CONFIDENCE_THRESHOLD", "0.6"))
+# Reranker scores range 0-4. Default threshold of 1.0 filters out poor matches
+# while accepting good semantic matches (typically score 2.0+).
+# The old 0.6 threshold was calibrated for BM25 @search.score (0-1 scale),
+# but we now use @search.reranker_score from Azure semantic reranker (0-4 scale).
+CONFIDENCE_THRESHOLD = float(os.getenv("CONFIDENCE_THRESHOLD", "1.0"))
 MIN_RESULTS_REQUIRED = 2
 
 
@@ -48,8 +52,10 @@ def evaluate(
         )
         return False
 
-    # ── Trigger 2: Top score below threshold ─────────────────────────────────
-    top_score = results[0].get("@search.score", 0.0)
+    # ── Trigger 2: Top reranker score below threshold ────────────────────────
+    # Use semantic reranker score (0-4 scale) when available; fall back to
+    # @search.score (RRF fusion, ~0-0.05 scale) only if reranker didn't run.
+    top_score = results[0].get("@search.reranker_score") or results[0].get("@search.score", 0.0)
     if top_score < CONFIDENCE_THRESHOLD:
         logger.info(
             "ConfidenceEvaluator → FAIL: Top score %.3f < threshold %.3f.",
@@ -59,12 +65,13 @@ def evaluate(
 
     # ── Trigger 3: Customer entity not found in results ───────────────────────
     if query_entities:
-        requested_customer = (query_entities.get("customer") or "").lower()
+        # Normalize same way as internal_search: lowercase + spaces → underscores
+        requested_customer = (query_entities.get("customer") or "").lower().replace(" ", "_")
         if requested_customer:
             # Check if any result belongs to the requested customer
             matching = [
                 r for r in results
-                if (r.get("customer_tag") or "").lower() == requested_customer
+                if (r.get("customer_tag") or "").lower().replace(" ", "_") == requested_customer
             ]
             if not matching:
                 logger.info(

@@ -34,26 +34,34 @@ _session_store = SessionStore()
 def run(
     user_message: str,
     conversation_id: str,
-    auth_token: str | None = None,   # accepted but not validated in v1
+    auth_token: str | None = None,      # accepted but not validated in v1
+    web_search_enabled: bool = False,   # toggle ON — hybrid internal + web
+    web_only: bool = False,             # one-time consent — web only (internal already failed)
 ) -> dict[str, Any]:
     """
     Process a user query and return a grounded answer with citations.
 
     Args:
-        user_message:    The raw user message.
-        conversation_id: UUID identifying the conversation (maintained by frontend).
-        auth_token:      Ignored in v1. Placeholder for v2 Azure AD integration.
+        user_message:       The raw user message.
+        conversation_id:    UUID identifying the conversation (maintained by frontend).
+        auth_token:         Ignored in v1. Placeholder for v2 Azure AD integration.
+        web_search_enabled: When True, skip internal search and go straight to web.
+                            When False (default), try internal first; if confidence
+                            is low, return needs_web_permission=True instead of
+                            auto-searching — letting the user decide.
 
     Returns:
         {
-            "answer":       str (Markdown),
-            "citations":    list of citation dicts,
-            "source_label": "INTERNAL" | "WEB",
+            "answer":               str (Markdown),
+            "citations":            list of citation dicts,
+            "source_label":         "INTERNAL" | "WEB",
+            "needs_web_permission": bool — True signals the frontend to prompt
+                                    the user for web search consent.
         }
     """
     logger.info(
-        "=== Orchestrator START | conv=%s | query='%s' ===",
-        conversation_id, user_message[:80]
+        "=== Orchestrator START | conv=%s | web_search=%s | query='%s' ===",
+        conversation_id, web_search_enabled, user_message[:80]
     )
 
     session = _session_store.get(conversation_id)
@@ -69,30 +77,13 @@ def run(
         intent, entities, metadata_filters
     )
 
-    # ── STEP 2: Follow-up detection ──────────────────────────────────────────
-    if _session_store.is_followup(entities, conversation_id):
-        logger.info("FOLLOW-UP: answering from session cache (%d chunks).", len(session.retrieved_chunks))
-        chunks = session.retrieved_chunks
-        source_label = session.source_label
-    else:
-        # ── STEP 3: Internal retrieval ───────────────────────────────────────
-        # Build a clean search query from the user message + parsed entities
-        search_query = _build_search_query(user_message, parsed)
-        chunks = internal_search.search(
-            query=search_query,
-            metadata_filters=metadata_filters,
-        )
-
-        # ── STEP 4: Confidence evaluation ────────────────────────────────────
-        if confidence_evaluate(chunks, query_entities=entities):
-            source_label = "INTERNAL"
-            logger.info("Confidence OK — using internal results.")
-        else:
-            logger.info("Confidence LOW — falling back to Bing web search.")
-            chunks = web_search.search(user_message)
-            source_label = "WEB"
-
-        # Update session with new retrieval results
+    # ── STEP 2: Route based on web_search_enabled flag ───────────────────────
+    if web_only:
+        # One-time consent path: internal search already ran and failed,
+        # so go straight to Tavily without wasting time on internal again.
+        logger.info("One-time web consent — web-only search.")
+        chunks = web_search.search(user_message)
+        source_label = "WEB"
         _session_store.update_retrieval(
             conversation_id=conversation_id,
             chunks=chunks,
@@ -100,15 +91,99 @@ def run(
             source_label=source_label,
         )
 
-    # ── STEP 5: Synthesise answer + build citations ──────────────────────────
+    elif web_search_enabled:
+        # Toggle ON path: user proactively wants web — run hybrid so internal
+        # document context is also included alongside fresh web results.
+        logger.info("Toggle ON — running hybrid internal + Tavily search.")
+        search_query = _build_search_query(user_message, parsed)
+        internal_chunks = internal_search.search(
+            query=search_query,
+            metadata_filters=metadata_filters,
+        )
+        web_chunks = web_search.search(user_message)
+        chunks = web_chunks + internal_chunks
+        source_label = "WEB"
+        _session_store.update_retrieval(
+            conversation_id=conversation_id,
+            chunks=chunks,
+            entities=entities,
+            source_label=source_label,
+        )
+
+    else:
+        # ── STEP 3: Follow-up detection ──────────────────────────────────────
+        if _session_store.is_followup(entities, conversation_id, user_message=user_message):
+            # Expand the vague follow-up query with the prior user question so the
+            # retrieval step gets a richer, unambiguous query (e.g. "list their names"
+            # → "who is the governing body of indigo? list their names").
+            prior_user_q = next(
+                (m["content"] for m in reversed(session.history) if m["role"] == "user"),
+                "",
+            )
+            expanded_query = f"{prior_user_q} {user_message}".strip() if prior_user_q else user_message
+            logger.info("FOLLOW-UP: expanded query = '%s'", expanded_query[:120])
+            chunks = internal_search.search(
+                query=expanded_query,
+                metadata_filters=metadata_filters,
+            )
+            source_label = "INTERNAL"
+
+        else:
+            # ── STEP 4: Internal retrieval ───────────────────────────────────
+            search_query = _build_search_query(user_message, parsed)
+            chunks = internal_search.search(
+                query=search_query,
+                metadata_filters=metadata_filters,
+            )
+
+            # ── STEP 5: Confidence evaluation ────────────────────────────────
+            if confidence_evaluate(chunks, query_entities=entities):
+                source_label = "INTERNAL"
+                logger.info("Confidence OK — using internal results.")
+            else:
+                # Toggle is OFF and confidence is low — ask the user for
+                # one-time consent to search the web for this query.
+                logger.info("Confidence LOW — requesting one-time web search permission.")
+                return {
+                    "answer": "",
+                    "citations": [],
+                    "source_label": "INTERNAL",
+                    "needs_web_permission": True,
+                }
+
+        _session_store.update_retrieval(
+            conversation_id=conversation_id,
+            chunks=chunks,
+            entities=entities,
+            source_label=source_label,
+        )
+
+    # ── STEP 6: Synthesise answer + build citations ──────────────────────────
     response = synthesise(
         user_query=user_message,
         retrieved_chunks=chunks,
         source_label=source_label,
         conversation_history=session.history,
     )
+    response["needs_web_permission"] = False
 
-    # ── STEP 6: Persist conversation history ─────────────────────────────────
+    # ── STEP 6b: Post-synthesis confidence check ─────────────────────────────
+    # Confidence passed (enough results, scores OK) but the LLM still couldn't
+    # ground an answer because the chunks were off-topic. Ask for web permission.
+    if (
+        source_label == "INTERNAL"
+        and not web_search_enabled
+        and "could not find" in response["answer"].lower()
+    ):
+        logger.info("Post-synthesis: LLM could not ground answer — requesting web search permission.")
+        return {
+            "answer": "",
+            "citations": [],
+            "source_label": "INTERNAL",
+            "needs_web_permission": True,
+        }
+
+    # ── STEP 7: Persist conversation history ─────────────────────────────────
     _session_store.append_history(
         conversation_id=conversation_id,
         user_message=user_message,
@@ -125,25 +200,22 @@ def run(
 
 def _build_search_query(user_message: str, parsed: dict[str, Any]) -> str:
     """
-    Build a clean search query by combining the raw message with
-    entity hints from the parser. Keeps it simple: if the parser
-    extracted a customer, prepend it for better keyword recall.
+    Build the search query sent to AI Search.
+
+    Always uses the full user message as the base (preserves semantic richness
+    for vector search). Prepends the customer name as a keyword boost only when
+    it isn't already present in the message text.
+
+    Previously this replaced the full message with just "customer topic", which
+    discarded critical query terms — e.g. "AI adoption and business impact" —
+    that are the exact headings of relevant document sections.
     """
-    customer = (parsed.get("entities") or {}).get("customer")
-    topic = (parsed.get("entities") or {}).get("topic")
+    customer = (parsed.get("entities") or {}).get("customer") or ""
 
-    parts = []
-    if customer:
-        parts.append(customer)
-    if topic:
-        parts.append(topic)
+    # Prepend customer for BM25 keyword boost if not already in the message
+    if customer and customer.lower() not in user_message.lower():
+        return f"{customer} {user_message}"
 
-    # If we extracted useful entities, use them as the primary search query
-    # (avoids noisy pronouns like "we", "our" that hurt keyword recall)
-    if parts:
-        return " ".join(parts)
-
-    # Otherwise, use the raw user message directly
     return user_message
 
 

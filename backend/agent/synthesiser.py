@@ -9,15 +9,12 @@ import os
 import logging
 from typing import Any
 
-from openai import AzureOpenAI
 from dotenv import load_dotenv
+
+from agent.groq_client import chat_completion, GROQ_MODEL
 
 load_dotenv()
 logger = logging.getLogger(__name__)
-
-AZURE_OPENAI_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT", "")
-AZURE_OPENAI_KEY = os.getenv("AZURE_OPENAI_KEY", "")
-CHAT_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT", "gpt-4o")
 
 SYNTHESIS_SYSTEM_PROMPT = """
 You are an internal knowledge assistant for a consulting firm.
@@ -43,22 +40,6 @@ Retrieved Passages:
 {passages}
 """
 
-_client: AzureOpenAI | None = None
-
-
-def _get_client() -> AzureOpenAI:
-    global _client
-    if _client is None:
-        if not AZURE_OPENAI_ENDPOINT or not AZURE_OPENAI_KEY:
-            raise EnvironmentError(
-                "AZURE_OPENAI_ENDPOINT and AZURE_OPENAI_KEY must be set in .env"
-            )
-        _client = AzureOpenAI(
-            api_key=AZURE_OPENAI_KEY,
-            azure_endpoint=AZURE_OPENAI_ENDPOINT,
-            api_version="2024-02-01",
-        )
-    return _client
 
 
 def _format_passages(chunks: list[dict[str, Any]]) -> str:
@@ -98,19 +79,45 @@ def format_citations(
         chunks:       Retrieved chunk dicts (internal or web results).
         source_label: "INTERNAL" if from AI Search, "WEB" if from Bing.
     """
-    seen_urls: set[str] = set()
+    # ── Score-based filtering ─────────────────────────────────────────────────
+    # Only cite chunks that are competitive with the top result.
+    # Chunks that happen to mention a keyword but aren't the actual source
+    # of the answer will have significantly lower reranker/search scores.
+    # We use a relative threshold: drop anything below 50% of the top score.
+    # Web results carry a placeholder score of 0.5 — skip filtering for them.
+    if source_label == "INTERNAL" and chunks:
+        def _score(c: dict) -> float:
+            return c.get("@search.reranker_score") or c.get("@search.score") or 0.0
+
+        top_score = max(_score(c) for c in chunks)
+        if top_score > 0:
+            cutoff = top_score * 0.5
+            chunks = [c for c in chunks if _score(c) >= cutoff]
+
+    seen_keys: set[tuple] = set()
     citations = []
     for chunk in chunks:
-        url = chunk.get("source_url", "")
-        # Deduplicate by URL (same document cited multiple times)
-        if url and url in seen_urls:
+        base_url = chunk.get("source_url", "")
+        page_num = chunk.get("page_number")
+        slide_num = chunk.get("slide_number")
+
+        # Deduplicate by (url, page_number) so different pages of the same
+        # document each appear as a separate citation.
+        dedup_key = (base_url, page_num)
+        if base_url and dedup_key in seen_keys:
             continue
-        seen_urls.add(url)
+        seen_keys.add(dedup_key)
+
+        # Append #page=N fragment so PDF viewers open directly to the cited page.
+        if page_num and base_url:
+            url = f"{base_url}#page={page_num}"
+        else:
+            url = base_url
 
         citations.append({
             "document_title": chunk.get("document_title", chunk.get("title", "Unknown")),
-            "page_number": chunk.get("page_number"),
-            "slide_number": chunk.get("slide_number"),
+            "page_number": page_num,
+            "slide_number": slide_num,
             "source_url": url,
             "content_type": chunk.get("content_type", "text"),
             "source_label": chunk.get("source_label", source_label),
@@ -161,10 +168,9 @@ def synthesise(
         messages.extend(conversation_history[-4:])
     messages.append({"role": "user", "content": user_message})
 
-    client = _get_client()
-    response = client.chat.completions.create(
-        model=CHAT_DEPLOYMENT,
-        messages=messages,  # type: ignore[arg-type]
+    response = chat_completion(
+        messages=messages,
+        model=GROQ_MODEL,
         temperature=0.1,    # Low creativity — accuracy over style
         max_tokens=1024,
     )
