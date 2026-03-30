@@ -17,9 +17,6 @@ azure-search-documents>=11.6.0
 azure-storage-blob>=12.20.0
 azure-identity>=1.16.0
 
-# Semantic Kernel (agent/orchestration framework)
-semantic-kernel>=1.5.0
-
 # Tokenisation (for chunking)
 tiktoken>=0.7.0
 
@@ -39,3 +36,7 @@ pypdf>=4.0.0        # PDF text extraction fallback (no CU required)
 
 # Substack scraper
 beautifulsoup4>=4.12.0  # extract clean text from Substack HTML
+
+# Eval tooling
+anthropic>=0.26.0       # Claude judge for T3 eval scoring (judge_t3.py)
+playwright>=1.45.0      # Full-stack browser eval (playwright_eval.py); run: python -m playwright install chromium
