@@ -1,0 +1,1940 @@
+{
+  "run_at": "2026-03-30T10:11:26",
+  "summary": {
+    "T1": {
+      "avg": 1.5,
+      "count": 10
+    },
+    "T2": {
+      "avg": 3.7,
+      "count": 10
+    },
+    "T3": {
+      "avg": 3.4,
+      "count": 10
+    }
+  },
+  "overall_avg": 2.87,
+  "results": [
+    {
+      "id": "Q01",
+      "tier": "T1",
+      "difficulty": "easy",
+      "question": "What was IndiGo's PAT (Profit After Tax) for Q1 FY26?",
+      "expected_answer": "INR 21,763 million (approximately INR 2,176 crore), with a PAT margin of 10.6%.",
+      "key_facts": [
+        "21,763 million",
+        "10.6% margin"
+      ],
+      "source": "indigo_deck.pdf — Financial Summary slide",
+      "system_answer": "I couldn't find enough information in the internal documents. Would you like me to search the web for this?",
+      "citations": [],
+      "source_label": "INTERNAL",
+      "needs_web_permission": true,
+      "scores": {
+        "retrieval_precision": 0,
+        "faithfulness": 1,
+        "completeness": 0,
+        "total": 1
+      },
+      "claude_scored": false,
+      "latency_s": 3.11,
+      "timed_out": false
+    },
+    {
+      "id": "Q02",
+      "tier": "T1",
+      "difficulty": "easy",
+      "question": "How many aircraft did IndiGo have in its fleet as of June 30, 2025?",
+      "expected_answer": "416 aircraft as of June 30, 2025 (including 3 A321 freighters and 11 damp leases).",
+      "key_facts": [
+        "416 aircraft",
+        "June 30 2025"
+      ],
+      "source": "indigo_deck.pdf — Fleet Breakup slide and Network presence slide",
+      "system_answer": "I couldn't find enough information in the internal documents. Would you like me to search the web for this?",
+      "citations": [],
+      "source_label": "INTERNAL",
+      "needs_web_permission": true,
+      "scores": {
+        "retrieval_precision": 0,
+        "faithfulness": 1,
+        "completeness": 0,
+        "total": 1
+      },
+      "claude_scored": false,
+      "latency_s": 3.07,
+      "timed_out": false
+    },
+    {
+      "id": "Q03",
+      "tier": "T1",
+      "difficulty": "easy",
+      "question": "What was IndiGo's load factor in Q1 FY26, and how did it compare to Q1 FY25?",
+      "expected_answer": "Load factor was 84.6% in Q1 FY26, down 2.1 percentage points from 86.7% in Q1 FY25.",
+      "key_facts": [
+        "84.6%",
+        "86.7%",
+        "-2.1 pts"
+      ],
+      "source": "indigo_deck.pdf — Revenue Breakup slide",
+      "system_answer": "I couldn't find enough information in the internal documents. Would you like me to search the web for this?",
+      "citations": [],
+      "source_label": "INTERNAL",
+      "needs_web_permission": true,
+      "scores": {
+        "retrieval_precision": 0,
+        "faithfulness": 1,
+        "completeness": 0,
+        "total": 1
+      },
+      "claude_scored": false,
+      "latency_s": 3.08,
+      "timed_out": false
+    },
+    {
+      "id": "Q04",
+      "tier": "T1",
+      "difficulty": "easy",
+      "question": "What was IndiGo's total income for Q1 FY26?",
+      "expected_answer": "INR 215,426 million, an increase of 6.4% compared to Q1 FY25 (INR 202,489 million).",
+      "key_facts": [
+        "215,426 million",
+        "6.4% increase"
+      ],
+      "source": "indigo_deck.pdf — Financial Summary slide",
+      "system_answer": "I couldn't find enough information in the internal documents. Would you like me to search the web for this?",
+      "citations": [],
+      "source_label": "INTERNAL",
+      "needs_web_permission": true,
+      "scores": {
+        "retrieval_precision": 0,
+        "faithfulness": 1,
+        "completeness": 0,
+        "total": 1
+      },
+      "claude_scored": false,
+      "latency_s": 3.07,
+      "timed_out": false
+    },
+    {
+      "id": "Q05",
+      "tier": "T1",
+      "difficulty": "easy",
+      "question": "Who signed the SEBI regulatory filing dated July 30, 2025 on behalf of InterGlobe Aviation?",
+      "expected_answer": "Neerja Sharma, Company Secretary & Chief Compliance Officer of InterGlobe Aviation Limited.",
+      "key_facts": [
+        "Neerja Sharma",
+        "Company Secretary",
+        "Chief Compliance Officer"
+      ],
+      "source": "Indigo.pdf — SEBI filing cover letter",
+      "system_answer": "**SEBI Regulatory Filing Signatory**\nThe SEBI regulatory filing dated July 30, 2025, on behalf of InterGlobe Aviation, was signed by **Neerja Sharma**, Company Secretary & Chief Compliance Officer.",
+      "citations": [
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 305,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=305",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 1,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=1",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo deck.pdf",
+          "page_number": 1,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20deck.pdf#page=1",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 67,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=67",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 306,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=306",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 59,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=59",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 61,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=61",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 91,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=91",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        }
+      ],
+      "source_label": "INTERNAL",
+      "needs_web_permission": false,
+      "scores": {
+        "retrieval_precision": 2,
+        "faithfulness": 2,
+        "completeness": 2,
+        "total": 6
+      },
+      "claude_scored": false,
+      "latency_s": 3.57,
+      "timed_out": false
+    },
+    {
+      "id": "Q06",
+      "tier": "T1",
+      "difficulty": "easy",
+      "question": "What was IndiGo's CASK (Cost per Available Seat Kilometre) in Q1 FY26, and how did it change YoY?",
+      "expected_answer": "CASK was INR 4.31 in Q1 FY26, a favourable improvement of 6.8% from INR 4.62 in Q1 FY25.",
+      "key_facts": [
+        "4.31 INR",
+        "4.62 INR",
+        "6.8% improvement"
+      ],
+      "source": "indigo_deck.pdf — Cost Breakup slide and CASK Non-IndAS measures slide",
+      "system_answer": "I couldn't find enough information in the internal documents. Would you like me to search the web for this?",
+      "citations": [],
+      "source_label": "INTERNAL",
+      "needs_web_permission": true,
+      "scores": {
+        "retrieval_precision": 0,
+        "faithfulness": 1,
+        "completeness": 0,
+        "total": 1
+      },
+      "claude_scored": false,
+      "latency_s": 3.06,
+      "timed_out": false
+    },
+    {
+      "id": "Q07",
+      "tier": "T1",
+      "difficulty": "easy",
+      "question": "How many domestic and international destinations did IndiGo serve in Q1 FY26?",
+      "expected_answer": "91 domestic destinations and 41 international destinations (directly operated). During Q1 FY26, IndiGo also provided services to 62 international destinations through strategic partnerships.",
+      "key_facts": [
+        "91 domestic",
+        "41 international",
+        "62 via partnerships"
+      ],
+      "source": "indigo_deck.pdf — Network Presence slide",
+      "system_answer": "I couldn't find enough information in the internal documents. Would you like me to search the web for this?",
+      "citations": [],
+      "source_label": "INTERNAL",
+      "needs_web_permission": true,
+      "scores": {
+        "retrieval_precision": 0,
+        "faithfulness": 1,
+        "completeness": 0,
+        "total": 1
+      },
+      "claude_scored": false,
+      "latency_s": 3.07,
+      "timed_out": false
+    },
+    {
+      "id": "Q08",
+      "tier": "T1",
+      "difficulty": "easy",
+      "question": "What was IndiGo's EBITDAR for Q1 FY26 and the corresponding margin?",
+      "expected_answer": "EBITDAR was INR 57,386 million, with an EBITDAR margin of 28.0% (down from 29.7% in Q1 FY25).",
+      "key_facts": [
+        "57,386 million",
+        "28.0% margin",
+        "down from 29.7%"
+      ],
+      "source": "indigo_deck.pdf — Financial Summary and EBITDAR Non-IndAS slides",
+      "system_answer": "I couldn't find enough information in the internal documents. Would you like me to search the web for this?",
+      "citations": [],
+      "source_label": "INTERNAL",
+      "needs_web_permission": true,
+      "scores": {
+        "retrieval_precision": 0,
+        "faithfulness": 1,
+        "completeness": 0,
+        "total": 1
+      },
+      "claude_scored": false,
+      "latency_s": 3.09,
+      "timed_out": false
+    },
+    {
+      "id": "Q09",
+      "tier": "T1",
+      "difficulty": "easy",
+      "question": "What was IndiGo's yield in Q1 FY26 and how did it compare to Q1 FY25?",
+      "expected_answer": "Yield was INR 4.98 per RPK in Q1 FY26, down 5.0% from INR 5.24 in Q1 FY25.",
+      "key_facts": [
+        "4.98 INR",
+        "5.24 INR",
+        "-5.0%"
+      ],
+      "source": "indigo_deck.pdf — Revenue Breakup slide",
+      "system_answer": "I couldn't find enough information in the internal documents. Would you like me to search the web for this?",
+      "citations": [],
+      "source_label": "INTERNAL",
+      "needs_web_permission": true,
+      "scores": {
+        "retrieval_precision": 0,
+        "faithfulness": 1,
+        "completeness": 0,
+        "total": 1
+      },
+      "claude_scored": false,
+      "latency_s": 3.07,
+      "timed_out": false
+    },
+    {
+      "id": "Q10",
+      "tier": "T1",
+      "difficulty": "easy",
+      "question": "What fuel cost benefit did IndiGo see in Q1 FY26?",
+      "expected_answer": "Aircraft fuel expenses decreased to INR 58,326 million from INR 64,165 million — a YoY improvement of 9.1%. The fuel CASK reduced by 21.9% YoY.",
+      "key_facts": [
+        "58,326 million",
+        "9.1% improvement",
+        "21.9% fuel CASK reduction"
+      ],
+      "source": "indigo_deck.pdf — Cost Breakup slide; indigo_latest_concall_strategy.pdf — CFO remarks",
+      "system_answer": "I couldn't find enough information in the internal documents. Would you like me to search the web for this?",
+      "citations": [],
+      "source_label": "INTERNAL",
+      "needs_web_permission": true,
+      "scores": {
+        "retrieval_precision": 0,
+        "faithfulness": 1,
+        "completeness": 0,
+        "total": 1
+      },
+      "claude_scored": false,
+      "latency_s": 3.08,
+      "timed_out": false
+    },
+    {
+      "id": "Q11",
+      "tier": "T2",
+      "difficulty": "medium",
+      "question": "What external events impacted IndiGo's Q1 FY26 performance, and what was the quantified impact on operations?",
+      "expected_answer": "Three main external events: (1) Pahalgam terrorist attack in late April disrupting Srinagar routes and triggering Pakistan airspace restrictions, impacting 30+ daily flights and cancelling Almaty/Tashkent routes. (2) NOTAMs in early May cancelling ~170 daily flights across 10 airports for over a week. (3) AI171 crash in June dampening travel sentiment, followed by Middle East conflict causing airspace closures and 100+ flight cancellations over two days. Collectively, industry passengers grew ~6% while IndiGo grew 12% despite these headwinds.",
+      "key_facts": [
+        "Pahalgam attack",
+        "30+ daily flights impacted",
+        "170 daily flights cancelled May",
+        "AI171 accident",
+        "100+ flights cancelled June",
+        "12% passenger growth vs 6% industry"
+      ],
+      "source": "indigo_latest_concall_strategy.pdf — CEO opening remarks (Pages 2-3)",
+      "system_answer": "### External Events Impacting IndiGo's Q1 FY26 Performance\nThe external events that impacted IndiGo's Q1 FY26 performance include:\n* NOTAMs issued in the first week of May, leading to the cancellation of around 170 daily flights across 10 airports for more than a week\n* The AI171 accident, which led to a caution in travel sentiment, particularly on the international side\n* Conflict in the Middle East region, leading to airspace closures from mid-June and the cancellation of over 100 flights for a period of two days\n\n### Quantified Impact on Operations\nThe quantified impact on operations includes:\n* Cancellation of around 170 daily flights across 10 airports for more than a week\n* Cancellation of over 100 flights for a period of two days due to airspace closures\n* Despite these challenges, IndiGo served more than 31 million customers, reflecting a solid growth of 12 percent compared to the same period last year.",
+      "citations": [
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 4,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=4",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 19,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=19",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 3,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=3",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 51,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=51",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 7,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=7",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 11,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=11",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 11,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=11",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        }
+      ],
+      "source_label": "INTERNAL",
+      "needs_web_permission": false,
+      "scores": {
+        "retrieval_precision": 2,
+        "faithfulness": 2,
+        "completeness": 1,
+        "total": 5
+      },
+      "claude_scored": false,
+      "latency_s": 4.61,
+      "timed_out": false
+    },
+    {
+      "id": "Q12",
+      "tier": "T2",
+      "difficulty": "medium",
+      "question": "The earnings deck shows PAT dropped 20.2% YoY. What did the CFO say were the main reasons for this decline?",
+      "expected_answer": "CFO Gaurav Negi attributed the PAT decline primarily to: (1) higher cancellations due to geopolitical headwinds causing yield moderation — yields down 5%, PRASK down ~7%; (2) lower load factors (84.6% vs 86.7%); (3) higher non-fuel costs including airport charges (+26.5%), employee costs (+16.7%), depreciation (+36.8%), and finance costs (+20.6%). The decline was partially offset by a favourable fuel price environment (fuel costs down 9.1%).",
+      "key_facts": [
+        "yield moderation",
+        "PRASK down 7%",
+        "load factor decline",
+        "fuel partially offset",
+        "geopolitical headwinds"
+      ],
+      "source": "indigo_deck.pdf — Financial Summary; indigo_latest_concall_strategy.pdf — CFO Gaurav Negi remarks",
+      "system_answer": "I couldn't find enough information in the internal documents. Would you like me to search the web for this?",
+      "citations": [],
+      "source_label": "INTERNAL",
+      "needs_web_permission": true,
+      "scores": {
+        "retrieval_precision": 0,
+        "faithfulness": 1,
+        "completeness": 0,
+        "total": 1
+      },
+      "claude_scored": false,
+      "latency_s": 3.58,
+      "timed_out": false
+    },
+    {
+      "id": "Q13",
+      "tier": "T2",
+      "difficulty": "medium",
+      "question": "What is IndiGo's long-haul strategy, and what concrete steps did it take in Q1 FY26 to execute it?",
+      "expected_answer": "IndiGo's long-haul strategy involves using widebody aircraft to tap unserved global routes. Concrete Q1 FY26 steps: (1) Signed MoU with Airbus to convert 30 purchase rights to firm orders (deliveries from 2032). (2) Signed agreement with Norse Atlantic for 6 widebody damp leases — one already operating Mumbai-Amsterdam and Mumbai-Manchester. (3) Plans to increase Amsterdam to 6 flights/week and Manchester to 4 flights/week from September. (4) Plans to launch London and Copenhagen. (5) Introduced Stretch product on Delhi-Bangkok and rolling out to Bangkok, Singapore, Dubai, Phuket from July.",
+      "key_facts": [
+        "Airbus MoU 30 aircraft",
+        "Norse Atlantic 6 widebodies",
+        "Mumbai-Amsterdam",
+        "Mumbai-Manchester",
+        "Amsterdam 6x weekly",
+        "Stretch product international"
+      ],
+      "source": "indigo_latest_concall_strategy.pdf — CEO Pieter Elbers strategic remarks (Pages 3-5)",
+      "system_answer": "### IndiGo's Long-Haul Strategy\nIndiGo's long-haul strategy involves expanding its fleet to include wide-body aircraft, such as the Airbus A321XLRs and A350-900s, to build long-haul capability and strengthen its international network. \n\n### Concrete Steps in Q1 FY26\nIn Q1 FY26, IndiGo took the following concrete steps to execute its long-haul strategy:\n* Signed an MoU with Airbus to convert 30 purchase rights into firm orders for wide-body aircraft\n* Signed an agreement with Norse Atlantic for 6 wide-body aircraft on damp lease, with one aircraft already inducted and flying from Mumbai to Amsterdam and Manchester\n* Introduced its business product, IndiGoStretch, on international flights, starting with the Delhi-Bangkok route using a damp-leased wide-body aircraft.",
+      "citations": [
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 18,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=18",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 4,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=4",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 5,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=5",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 47,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=47",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 11,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=11",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 48,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=48",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 10,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=10",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        }
+      ],
+      "source_label": "INTERNAL",
+      "needs_web_permission": false,
+      "scores": {
+        "retrieval_precision": 2,
+        "faithfulness": 2,
+        "completeness": 0,
+        "total": 4
+      },
+      "claude_scored": false,
+      "latency_s": 4.08,
+      "timed_out": false
+    },
+    {
+      "id": "Q14",
+      "tier": "T2",
+      "difficulty": "medium",
+      "question": "How did IndiGo's free cash and total debt position change between June 2024 and June 2025?",
+      "expected_answer": "Free cash increased significantly by 57.6% from INR 220,876 million to INR 348,019 million. Restricted cash rose 4.2% to INR 146,038 million, bringing total cash to INR 494,057 million (+36.9%). Total debt rose 30.4% from INR 525,264 million to INR 684,884 million, driven mainly by a 186.8% surge in debt excluding capitalised operating lease liability (from INR 75,697 million to INR 217,066 million), while capitalised operating lease liability grew more modestly at 4.1%.",
+      "key_facts": [
+        "free cash +57.6%",
+        "348,019 million",
+        "total debt +30.4%",
+        "684,884 million",
+        "non-lease debt +186.8%"
+      ],
+      "source": "indigo_deck.pdf — Cash and Debt slide",
+      "system_answer": "I couldn't find enough information in the internal documents. Would you like me to search the web for this?",
+      "citations": [],
+      "source_label": "INTERNAL",
+      "needs_web_permission": true,
+      "scores": {
+        "retrieval_precision": 0,
+        "faithfulness": 1,
+        "completeness": 0,
+        "total": 1
+      },
+      "claude_scored": false,
+      "latency_s": 3.59,
+      "timed_out": false
+    },
+    {
+      "id": "Q15",
+      "tier": "T2",
+      "difficulty": "medium",
+      "question": "What codeshare partnerships did IndiGo announce or expand during Q1 FY26?",
+      "expected_answer": "Four key partnership developments: (1) KLM partnership became reciprocal, giving IndiGo customers access to 30 destinations in Europe and UK via Amsterdam. (2) Japan Airlines partnership became reciprocal, with IndiGo placing codes on JAL Southeast Asia-Tokyo flights. (3) New codeshare with Jetstar for Australia and New Zealand connections. (4) Partnership with Delta Airlines announced at IATA AGM for transatlantic network access. (5) Virgin Atlantic partnership also became reciprocal for India-UK-North America connectivity.",
+      "key_facts": [
+        "KLM reciprocal",
+        "Japan Airlines reciprocal",
+        "Jetstar",
+        "Delta Airlines",
+        "Virgin Atlantic"
+      ],
+      "source": "indigo_latest_concall_strategy.pdf — CEO remarks on partnerships (Page 4-5)",
+      "system_answer": "### Codeshare Partnerships Announced or Expanded by IndiGo during Q1 FY26\n* IndiGo announced new partnerships, including a codeshare agreement with Jetstar, enabling connections to Australia and New Zealand.\n* A partnership with Delta Airlines was announced, allowing IndiGo customers to connect to Delta's transatlantic network.\n* The existing partnership with KLM became reciprocal, enabling IndiGo customers to access 30 destinations in Europe and the UK.\n* The partnership with Japan Airlines also became reciprocal.\n* The partnership with Virgin Atlantic will become reciprocal, enhancing connectivity between India, the UK, and North America.",
+      "citations": [
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 5,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=5",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 48,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=48",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 6,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=6",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 12,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=12",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 10,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=10",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo deck.pdf",
+          "page_number": 4,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20deck.pdf#page=4",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 9,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=9",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        }
+      ],
+      "source_label": "INTERNAL",
+      "needs_web_permission": false,
+      "scores": {
+        "retrieval_precision": 2,
+        "faithfulness": 2,
+        "completeness": 1,
+        "total": 5
+      },
+      "claude_scored": false,
+      "latency_s": 20.32,
+      "timed_out": false
+    },
+    {
+      "id": "Q16",
+      "tier": "T2",
+      "difficulty": "medium",
+      "question": "The deck shows depreciation jumped 36.8% YoY. The CFO also discussed a shift in leasing strategy. How are these connected?",
+      "expected_answer": "IndiGo has been deliberately shifting from operating leases to finance leases and owned aircraft. Finance lease count grew from 31 (June 2024) to 69 (June 2025). Under finance leases, depreciation and interest costs are recognised (unlike operating leases where only rent is expensed). This explains the jump in depreciation from INR 18,758 million to INR 25,660 million. The CFO noted the strategic rationale is to build asset ownership rather than perpetually return aircraft, supported by their MRO strategy.",
+      "key_facts": [
+        "finance lease count 31 to 69",
+        "depreciation 18,758 to 25,660",
+        "ownership strategy",
+        "MRO strategy"
+      ],
+      "source": "indigo_deck.pdf — Cost Breakup and Fleet Breakup; indigo_latest_concall_strategy.pdf — Jinesh Joshi Q&A on finance leases",
+      "system_answer": "### Connection between Depreciation Jump and Leasing Strategy Shift\nThe shift in leasing strategy from operating leases to finance leases is connected to the 36.8% YoY jump in depreciation. **According to the CFO, the benefit of a finance lease is that it provides an option to buy out the aircraft at the end of the lease term**, which is part of the company's strategy to build an airline with ownership of assets. \n* In a finance lease, **depreciation and interest costs are higher in the initial period**, which contributes to the increase in depreciation.\n* The company is shifting from operating leases, where the asset is returned at the end of the lease, to finance leases, which offer a path to ownership.",
+      "citations": [
+        {
+          "document_title": "Air_India.pdf",
+          "page_number": 105,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/air_india/Air_India.pdf#page=105",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo deck.pdf",
+          "page_number": 13,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20deck.pdf#page=13",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 18,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=18",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 213,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=213",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 14,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=14",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "shell-annual-report-2024.pdf",
+          "page_number": 58,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/shell/shell-annual-report-2024.pdf#page=58",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        }
+      ],
+      "source_label": "INTERNAL",
+      "needs_web_permission": false,
+      "scores": {
+        "retrieval_precision": 2,
+        "faithfulness": 2,
+        "completeness": 0,
+        "total": 4
+      },
+      "claude_scored": false,
+      "latency_s": 4.63,
+      "timed_out": false
+    },
+    {
+      "id": "Q17",
+      "tier": "T2",
+      "difficulty": "medium",
+      "question": "What guidance did IndiGo give for Q2 FY26 capacity (ASK) and revenue (PRASK), and what was the reasoning?",
+      "expected_answer": "Q2 FY26 ASK guidance: mid-to-high single digit growth YoY (vs 16.4% in Q1). This reflects deliberate capacity moderation — Q2 is seasonally the softest domestic quarter, airlines use this period for maintenance and fleet upgrades, and some damp leases are being returned. PRASK guidance: similar to Q2 FY25 year-over-year, with July showing stabilisation and August-September expected to improve. Full-year guidance unchanged at early double-digit capacity growth.",
+      "key_facts": [
+        "mid-to-high single digit ASK",
+        "PRASK flat YoY",
+        "Q2 seasonal softness",
+        "full year early double-digit unchanged"
+      ],
+      "source": "indigo_latest_concall_strategy.pdf — CFO Gaurav Negi guidance remarks and Q&A with Amyn Pirani",
+      "system_answer": "### Guidance for Q2 FY26 Capacity (ASK) and Revenue (PRASK)\n* IndiGo expects to add capacity in the mid to high single digit as compared to the same period last year.\n* The company is estimating similar passenger unit revenues (PRASK) for the second quarter as compared to the same period last year.\n* The reasoning behind this guidance is that Q2 is typically a soft quarter, and the company is adjusting its capacity to align with demand, while also using the downtime to conduct maintenance and implement fleet upgrades.",
+      "citations": [
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 9,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=9",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 19,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=19",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 17,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=17",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 14,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=14",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 7,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=7",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 10,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=10",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        }
+      ],
+      "source_label": "INTERNAL",
+      "needs_web_permission": false,
+      "scores": {
+        "retrieval_precision": 2,
+        "faithfulness": 2,
+        "completeness": 0,
+        "total": 4
+      },
+      "claude_scored": false,
+      "latency_s": 4.64,
+      "timed_out": false
+    },
+    {
+      "id": "Q18",
+      "tier": "T2",
+      "difficulty": "medium",
+      "question": "How did IndiGo's airport fees and charges change in Q1 FY26 and what does management attribute this to?",
+      "expected_answer": "Airport fees and charges rose 26.5% YoY from INR 12,861 million to INR 16,269 million. This increase is attributed to: (1) IndiGo's 16.4% capacity expansion (more flights = more fees), (2) significant international network expansion to new airports (international airports typically charge higher fees), and (3) annual contractual fee escalations. The CFO noted this is part of the natural inflation across non-fuel cost line items, though CASK ex-fuel ex-forex is expected to remain flat for full-year FY26.",
+      "key_facts": [
+        "16,269 million",
+        "+26.5%",
+        "international expansion",
+        "annual escalations"
+      ],
+      "source": "indigo_deck.pdf — Cost Breakup; indigo_latest_concall_strategy.pdf — Ankur (Axis Capital) Q&A on cost inflation",
+      "system_answer": "**Airport Fees and Charges Change in Q1 FY26**\nAccording to the provided passages, airport fees and charges for IndiGo increased by 26.5% in Q1 FY26 compared to Q1 FY25, from 12,861 to 16,269 (in INR million). \n**Management Attribution**\nThe management attributes this increase to annual contractual increases across line items, partially offset by the reduction in the number of damp leases.",
+      "citations": [
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 14,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=14",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 138,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=138",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 12,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=12",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 224,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=224",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo deck.pdf",
+          "page_number": 10,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20deck.pdf#page=10",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 8,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=8",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 133,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=133",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 154,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=154",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        }
+      ],
+      "source_label": "INTERNAL",
+      "needs_web_permission": false,
+      "scores": {
+        "retrieval_precision": 2,
+        "faithfulness": 2,
+        "completeness": 0,
+        "total": 4
+      },
+      "claude_scored": false,
+      "latency_s": 4.59,
+      "timed_out": false
+    },
+    {
+      "id": "Q19",
+      "tier": "T2",
+      "difficulty": "medium",
+      "question": "What new domestic destinations and airports did IndiGo announce or target in Q1 FY26?",
+      "expected_answer": "New domestic destinations launched: Hindon in Ghaziabad and Adampur in Jalandhar. New airports being targeted: IndiGo plans to be the launch carrier at Jewar (near Delhi) and Navi Mumbai airports, both described as critical parts of India's next wave of aviation infrastructure.",
+      "key_facts": [
+        "Hindon Ghaziabad",
+        "Adampur Jalandhar",
+        "Jewar airport",
+        "Navi Mumbai airport"
+      ],
+      "source": "indigo_latest_concall_strategy.pdf — CEO domestic network remarks (Page 5)",
+      "system_answer": "### New Domestic Destinations and Airports in Q1 FY26\n* IndiGo launched 2 new destinations: Hindon in Ghaziabad and Adampur in Jalandhar.\n* The airline is also gearing up to be the launch carrier at the two new airports: Jewar and Navi Mumbai. \n* Additionally, IndiGo added 7 new domestic destinations, but the specific names are not mentioned in the provided passages, except for the ones mentioned above.",
+      "citations": [
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 6,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=6",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 12,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=12",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo deck.pdf",
+          "page_number": 4,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20deck.pdf#page=4",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 9,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=9",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 21,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=21",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 59,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=59",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 48,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=48",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        }
+      ],
+      "source_label": "INTERNAL",
+      "needs_web_permission": false,
+      "scores": {
+        "retrieval_precision": 2,
+        "faithfulness": 2,
+        "completeness": 0,
+        "total": 4
+      },
+      "claude_scored": false,
+      "latency_s": 4.09,
+      "timed_out": false
+    },
+    {
+      "id": "Q20",
+      "tier": "T2",
+      "difficulty": "medium",
+      "question": "What is IndiGo Ventures and what milestone did it achieve in Q1 FY26?",
+      "expected_answer": "IndiGo Ventures is IndiGo's venture capital arm, launched in August 2024 to invest in early-stage startups driving innovation in aviation and allied sectors. In Q1 FY26, it achieved two milestones: (1) First close of fund at INR 450 crores, and (2) Announced its debut investment in Jeh Aerospace, a Hyderabad-based startup focused on high-precision aerospace and defense manufacturing.",
+      "key_facts": [
+        "IndiGo Ventures",
+        "August 2024 launch",
+        "first close INR 450 crores",
+        "Jeh Aerospace",
+        "Hyderabad"
+      ],
+      "source": "indigo_latest_concall_strategy.pdf — CFO strategic initiatives (Page 7)",
+      "system_answer": "### IndiGo Ventures Overview and Milestone\nIndiGo Ventures is the venture capital arm of IndiGo, launched in August 2024 to invest in early-stage startups driving innovation in aviation and allied sectors. \n* In Q1 FY26, IndiGo Ventures achieved a milestone with the first close of its fund at INR 450 crores.\n* It also announced its debut investment in Jeh Aerospace, a fast-growing aerospace startup.",
+      "citations": [
+        {
+          "document_title": "indigo deck.pdf",
+          "page_number": 14,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20deck.pdf#page=14",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 8,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=8",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 4,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=4",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 54,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=54",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 59,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=59",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 97,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=97",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 11,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=11",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        }
+      ],
+      "source_label": "INTERNAL",
+      "needs_web_permission": false,
+      "scores": {
+        "retrieval_precision": 2,
+        "faithfulness": 2,
+        "completeness": 1,
+        "total": 5
+      },
+      "claude_scored": false,
+      "latency_s": 4.08,
+      "timed_out": false
+    },
+    {
+      "id": "Q21",
+      "tier": "T3",
+      "difficulty": "hard",
+      "question": "IndiGo grew passengers by 12% in Q1 FY26 — double the industry rate — yet PAT fell 20.2% YoY. What does this tell us about the quality of that volume growth, and how did management frame it?",
+      "expected_answer": "The divergence reveals that volume growth came at a cost to revenue quality (yield compression). While IndiGo captured disproportionate market share, cancellations and demand weakness caused by external events forced yield dilution — yields fell 5% and PRASK fell 7%, while load factors dropped 2.1 pts. So IndiGo flew more passengers but earned less per seat-km. Management framed this as an externally-driven, temporary phenomenon: April was tracking strongly before headwinds hit in May-June. They highlighted the 12% growth as demonstrating network resilience while contextualising the profit decline as event-specific rather than structural. The fuel tailwind (costs down 9.1%) partially offset the revenue pressure, preventing an even steeper profit decline.",
+      "key_facts": [
+        "12% passenger growth vs 6% industry",
+        "PAT -20.2%",
+        "yield -5%",
+        "PRASK -7%",
+        "load factor -2.1 pts",
+        "fuel offset",
+        "April strong before events"
+      ],
+      "source": "indigo_deck.pdf — Financial Summary, Revenue Breakup; indigo_latest_concall_strategy.pdf — CEO and CFO remarks, Arvind Sharma yield Q&A",
+      "system_answer": "### Quality of Volume Growth and Management's Perspective\nThe 12% growth in passengers for IndiGo in Q1 FY26, double the industry rate, was accompanied by a 20.2% YoY decline in PAT. This suggests that the volume growth may not be of high quality, as it did not translate to profitability. \n* Management framed this as a resilient quarter despite industry headwinds, with a strong growth in passengers.\n* They attributed the decline in profitability to external factors such as geopolitical events, airspace restrictions, and the impact of a tragic accident in the Indian aviation industry.",
+      "citations": [
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 4,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=4",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 19,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=19",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 7,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=7",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 42,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=42",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 50,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=50",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 8,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=8",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 49,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=49",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo deck.pdf",
+          "page_number": 14,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20deck.pdf#page=14",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        }
+      ],
+      "source_label": "INTERNAL",
+      "needs_web_permission": false,
+      "scores": {
+        "retrieval_precision": 2,
+        "faithfulness": 2,
+        "completeness": 0,
+        "total": 4
+      },
+      "claude_scored": false,
+      "latency_s": 4.09,
+      "timed_out": false
+    },
+    {
+      "id": "Q22",
+      "tier": "T3",
+      "difficulty": "hard",
+      "question": "An investor is worried that IndiGo's full-year FY26 early double-digit ASK guidance is now at risk given the weak Q1 and conservative Q2. What evidence does management provide to support that guidance, and what are the implicit assumptions?",
+      "expected_answer": "Management's case rests on three pillars: (1) Q1 already delivered 16.4% ASK growth — a high base that gives them room. (2) Q2 moderation is deliberate (seasonal softness, maintenance use of downtime, damp lease returns) rather than demand-driven, and was included in original planning. (3) Q3 and Q4 are structurally strong quarters where fleet is scaled up via new deliveries (weekly cadence from the 2015 order book) and potential additional damp leases. Implicit assumptions: (a) geopolitical disruptions do not return at Q1 scale; (b) yield recovery materialises in August-September as stabilisation trends suggest; (c) fleet availability (AOGs stable in 40s) supports capacity ramp. The guidance was explicitly not revised, which management used as a signal of confidence.",
+      "key_facts": [
+        "Q1 16.4% already delivered",
+        "Q2 in original plan",
+        "Q3/Q4 strong seasonally",
+        "weekly deliveries",
+        "guidance not revised"
+      ],
+      "source": "indigo_latest_concall_strategy.pdf — Pieter Elbers response to Amyn Pirani, CFO Q2 guidance, Kushagra CWC Advisors Q&A",
+      "system_answer": "### Evidence to Support Guidance\nManagement provides evidence to support the full-year FY26 early double-digit ASK guidance by stating that they are committed to an early double-digit capacity growth for the full year, despite Q2 being a soft quarter. They plan to deploy capacity in Q3 and Q4, which are expected to be stronger quarters, through new deliveries and additional damp leases.\n\n### Implicit Assumptions\nThe implicit assumptions behind the guidance include:\n* Q3 and Q4 will be stronger quarters, allowing for increased capacity deployment\n* Demand will be stronger in the second half of the year, driven by reduced capacity in the industry\n* Load factors will be stronger, supporting the growth in capacity\n* The company will be able to adjust its network and capacity to meet seasonal demand.",
+      "citations": [
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 19,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=19",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 17,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=17",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 14,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=14",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 3,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=3",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 4,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=4",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 10,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=10",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 16,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=16",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        }
+      ],
+      "source_label": "INTERNAL",
+      "needs_web_permission": false,
+      "scores": {
+        "retrieval_precision": 2,
+        "faithfulness": 2,
+        "completeness": 0,
+        "total": 4
+      },
+      "claude_scored": false,
+      "latency_s": 4.57,
+      "timed_out": false
+    },
+    {
+      "id": "Q23",
+      "tier": "T3",
+      "difficulty": "hard",
+      "question": "How is IndiGo's strategy evolving from a cost-focused LCC into something more complex, and what tensions does this create?",
+      "expected_answer": "IndiGo is simultaneously pursuing: (a) widebody long-haul flights (Amsterdam, Manchester, plans for London/Copenhagen) with hot meals, Stretch premium product — departing from its LCC model; (b) Finance lease ownership strategy vs its historically asset-light operating lease model, which increases depreciation/interest costs now for eventual ownership benefits; (c) IndiGo Ventures as an investor in adjacent sectors; (d) MRO development with BIAL. The tensions: long-haul requires higher product costs, service standards, and seat configurations that conflict with its lean cost base (CASK ex-fuel already rising 2.5% YoY). Management resolves this with 'fit-for-purpose' framing — different product tiers for different routes rather than a single LCC formula. The finance lease shift also raises near-term depreciation drag (up 36.8%) before ownership benefits accrue. The risk is that complexity erodes the cost discipline that is IndiGo's core competitive moat.",
+      "key_facts": [
+        "widebody long-haul",
+        "finance lease ownership shift",
+        "Stretch product",
+        "CASK ex-fuel +2.5%",
+        "depreciation +36.8%",
+        "fit-for-purpose framing"
+      ],
+      "source": "indigo_latest_concall_strategy.pdf — CEO strategic remarks, CFO cost/lease commentary; indigo_deck.pdf — Cost Breakup",
+      "system_answer": "### IndiGo's Evolving Strategy\nIndiGo is evolving from a cost-focused Low-Cost Carrier (LCC) into a more complex entity by:\n* Introducing new products like **IndiGoStretch**, a business class product\n* Expanding its network through new routes and codeshare alliances\n* Investing in digital transformation to enhance customer experience and operational efficiency\n* Focusing on sustainability and reducing carbon emissions\n\n### Tensions Created\nThis evolution creates tensions as IndiGo needs to balance its low-cost structure with the introduction of new products and services, while also managing the increasing complexity of its operations and network.",
+      "citations": [
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 51,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=51",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 48,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=48",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 12,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=12",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 47,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=47",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 53,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=53",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 8,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=8",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 5,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=5",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 49,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=49",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        }
+      ],
+      "source_label": "INTERNAL",
+      "needs_web_permission": false,
+      "scores": {
+        "retrieval_precision": 2,
+        "faithfulness": 2,
+        "completeness": 0,
+        "total": 4
+      },
+      "claude_scored": false,
+      "latency_s": 4.57,
+      "timed_out": false
+    },
+    {
+      "id": "Q24",
+      "tier": "T3",
+      "difficulty": "hard",
+      "question": "What does IndiGo's damp lease trajectory tell us about the AOG (Aircraft on Ground) situation, and how did the CFO say this would affect the P&L going forward?",
+      "expected_answer": "The AOG situation peaked with groundings in the mid-70s, driving IndiGo to induct large numbers of damp leases to maintain capacity. As groundings declined to 'stable in forties,' IndiGo began returning damp leases from March 2025, redelivering 16 during Q1 FY26. This explains: (1) Aircraft and engine rentals fell 21.1% YoY as damp leases reduced; (2) Fuel CASK dropped 21.9% YoY partly because older-generation (less efficient) damp lease aircraft were redelivered; (3) Other operating income will decline as AOG-related claims reduce in proportion to AOG numbers. Going forward, narrow-body damp leases will keep reducing but widebody damp leases (Norse Atlantic) will partially offset this in the rental line. The CFO said they remain open to inducting additional damp leases for Q3/Q4 peak demand if needed.",
+      "key_facts": [
+        "AOGs peaked mid-70s",
+        "now stable in 40s",
+        "16 damp leases returned Q1",
+        "rentals -21.1%",
+        "other income will decline with AOGs",
+        "open to new damp leases Q3/Q4"
+      ],
+      "source": "indigo_deck.pdf — Cost Breakup, Fleet Breakup; indigo_latest_concall_strategy.pdf — CFO fleet remarks + Pulkit Patni rental Q&A + Ankur cost Q&A",
+      "system_answer": "### IndiGo's Damp Lease Trajectory and AOG Situation\nIndiGo's damp lease trajectory indicates a reduction in the number of damp leases, which were taken to offset the AOG (Aircraft on Ground) situation. As the AOG numbers have declined, the company has started returning damp-leases from March onwards and has redelivered 16 damp leased aircraft during the quarter.\n\n### Impact on P&L\nAccording to the CFO, Gaurav Negi, the reduction in damp leases will lead to a decrease in aircraft rental costs, but this will be partially offset by annual increases in airport charges and other expenses. The CASK ex-fuel ex-forex is expected to remain at similar levels as the previous financial year. The other operating income, which includes AOG-related claims, will also moderate downwards as the AOG numbers decline.",
+      "citations": [
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 8,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=8",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 14,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=14",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 15,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=15",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 13,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=13",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 48,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=48",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 17,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=17",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 9,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=9",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 51,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=51",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        }
+      ],
+      "source_label": "INTERNAL",
+      "needs_web_permission": false,
+      "scores": {
+        "retrieval_precision": 1,
+        "faithfulness": 2,
+        "completeness": 0,
+        "total": 3
+      },
+      "claude_scored": false,
+      "latency_s": 4.07,
+      "timed_out": false
+    },
+    {
+      "id": "Q25",
+      "tier": "T3",
+      "difficulty": "hard",
+      "question": "If you were stress-testing IndiGo's H2 FY26 recovery thesis, what are the three biggest risks based on management's own commentary?",
+      "expected_answer": "Based on management's own stated assumptions and caveats: (1) Geopolitical risk recurrence — management acknowledged Q1 headwinds were 'external' and that Q2 is 'stabilising', but a repeat of airspace closures or demand shocks would invalidate both the yield recovery thesis and the volume ramp. (2) Yield recovery may not materialise — PRASK guidance for Q2 is 'flat YoY' implying no recovery yet; management is 'hopeful' for August-September, which is not a hard commitment. A weaker-than-expected yield environment going into peak Q3 would significantly compress profitability. (3) Fleet availability / AOG uncertainty — grounded aircraft remain 'stable in the forties'; any re-escalation (engine supply issues, GTF problems) would limit capacity in Q3/Q4 precisely when management plans to scale up. Management said they 'remain open to damp leases' suggesting some supply uncertainty remains.",
+      "key_facts": [
+        "geopolitical risk",
+        "yield recovery uncertain",
+        "AOGs stable but not resolved",
+        "damp lease optionality retained"
+      ],
+      "source": "indigo_latest_concall_strategy.pdf — Multiple Q&A sessions throughout transcript",
+      "system_answer": "### Biggest Risks to IndiGo's H2 FY26 Recovery Thesis\nBased on management's commentary, the three biggest risks are:\n* **Operational challenges with aircraft engines**: Persistent impediments in the availability of spare engines due to supply chain bottlenecks and powder metal production constraints.\n* **Competitive dynamics in the airline industry**: Pronounced competition from new market entrants, mergers, and rival carriers operating within analogous routes and segments.\n* **Climate change related risk**: Regulatory risks from evolving climate change regulations, including the potential cost of offsetting emissions growth on international flights under ICAO's CORSIA scheme.",
+      "citations": [
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 51,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=51",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 53,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=53",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 52,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=52",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 139,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=139",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 4,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=4",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 134,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=134",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        }
+      ],
+      "source_label": "INTERNAL",
+      "needs_web_permission": false,
+      "scores": {
+        "retrieval_precision": 2,
+        "faithfulness": 2,
+        "completeness": 0,
+        "total": 4
+      },
+      "claude_scored": false,
+      "latency_s": 4.58,
+      "timed_out": false
+    },
+    {
+      "id": "Q26",
+      "tier": "T3",
+      "difficulty": "hard",
+      "question": "IndiGo described itself as the '7th largest airline in the world by daily departures.' What other competitive positioning claims did management make in the call, and how do the financials support or complicate these claims?",
+      "expected_answer": "Competitive claims made: (1) 7th largest by daily departures globally; (2) Leader in on-time performance since November 2024; (3) One of the highest technical dispatch reliabilities in the industry; (4) Passenger growth of 12% vs industry 6% (double); (5) 90% of Indian population within 100km of an IndiGo-served airport; (6) Market share higher than competitors on load factor. Financial nuance: While load factor leadership and passenger growth support these claims, the 20.2% PAT decline and 10.6% margin (vs 13.9% prior year) reveal that market share gains came at cost. RASK fell 10% YoY, suggesting the competitive position was partly maintained through price. The cost leadership claim is partially undermined by CASK ex-fuel rising 2.5% YoY.",
+      "key_facts": [
+        "7th largest globally",
+        "OTP leader since Nov 2024",
+        "12% vs 6% growth",
+        "90% population coverage",
+        "RASK -10%",
+        "CASK ex-fuel +2.5%"
+      ],
+      "source": "indigo_latest_concall_strategy.pdf — CEO remarks throughout; indigo_deck.pdf — Financial Summary, Revenue Breakup",
+      "system_answer": "### Competitive Positioning Claims\nIndiGo described itself as the '7th largest airline in the world by daily departures.' Other competitive positioning claims made by management include:\n* 2nd fastest-growing airline in terms of seat capacity (CY 2024)\n* Largest orderbook\n* One of the fastest-growing airlines in the world\n* Amongst the highest aircraft utilisations in the world\n* Ranked amongst the world’s leading airlines\n\n### Financial Support\nThe financials support these claims with:\n* A strong financial performance in FY 2025, resulting in IndiGo becoming a $10 billion revenue company\n* A 13% capacity growth and an 18% increase in total income\n* A net profit of `73 billion\n* A proposed dividend of `10 per share, subject to approval in the AGM\n* A long-term investment grade rating by Moody’s with a stable outlook, highlighting India’s robust economic growth, IndiGo’s dominant market position, healthy financials, and industry-best cost efficiency.",
+      "citations": [
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 47,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=47",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 8,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=8",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 7,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=7",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 17,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=17",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 53,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=53",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 50,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=50",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        }
+      ],
+      "source_label": "INTERNAL",
+      "needs_web_permission": false,
+      "scores": {
+        "retrieval_precision": 2,
+        "faithfulness": 2,
+        "completeness": 0,
+        "total": 4
+      },
+      "claude_scored": false,
+      "latency_s": 4.59,
+      "timed_out": false
+    },
+    {
+      "id": "Q27",
+      "tier": "T3",
+      "difficulty": "hard",
+      "question": "How does IndiGo's approach to international competition — particularly from Middle East carriers — differ from its domestic strategy, and what risks did analysts probe in this area?",
+      "expected_answer": "On Middle East competition: Pieter Elbers argued IndiGo's cost leadership and four customer promises are the defence mechanisms. He noted IndiGo grew 12% overall vs industry 6%, which he said speaks to competitive positioning. On bilaterals: he explained that bilateral capacity expansion requires mutual agreement (both sides must want it), so pressure from Middle East carriers alone doesn't automatically increase their frequencies — he used Kuwait and Thailand as recent examples of bilaterals being updated. Analyst Achal Kumar (HSBC) probed whether increased bilateral seats to Middle East would intensify competition; management's response was that Indian operators benefit too when bilateral seats increase. Implicit tension: IndiGo's cost model was built for domestic short-haul; on international routes, Middle East carriers have hub network advantages and significant product differentiation that a pure cost argument may not fully neutralise.",
+      "key_facts": [
+        "cost leadership defence",
+        "bilateral requires mutual agreement",
+        "Kuwait bilateral updated",
+        "Thailand bilateral example",
+        "Indian operators benefit too",
+        "hub network advantage of ME carriers"
+      ],
+      "source": "indigo_latest_concall_strategy.pdf — Binay Singh Q&A on international, Achal Kumar Q&A on bilaterals",
+      "system_answer": "### Approach to International Competition\nIndiGo's approach to international competition, particularly from Middle East carriers, differs from its domestic strategy in that it focuses on **cost leadership**, **exemplary customer service**, and **stringent adherence to on-time performance**. \n\n### Risks Probed by Analysts\nAnalysts probed risks related to **international profitability**, **load factors on long-haul flights**, and **competition from Middle East carriers**. However, IndiGo believes its **relentless focus on cost leadership** and **network expansion** position it well to deal with this competition. \n\n### Key Strategies\nKey strategies include:\n* Expanding international operations\n* Focusing on cost leadership\n* Enhancing customer experience\n* Building strategic partnerships with global airlines",
+      "citations": [
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 51,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=51",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 48,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=48",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 53,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=53",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 11,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=11",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 4,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=4",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 52,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=52",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 12,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=12",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        }
+      ],
+      "source_label": "INTERNAL",
+      "needs_web_permission": false,
+      "scores": {
+        "retrieval_precision": 2,
+        "faithfulness": 2,
+        "completeness": 0,
+        "total": 4
+      },
+      "claude_scored": false,
+      "latency_s": 4.59,
+      "timed_out": false
+    },
+    {
+      "id": "Q28",
+      "tier": "T3",
+      "difficulty": "hard",
+      "question": "Trace the complete P&L impact of IndiGo's shift from damp leases (narrowbody) to owned/finance-leased aircraft and widebody damp leases (Norse). Which line items improve and which worsen?",
+      "expected_answer": "Improving lines from returning narrowbody damp leases: (1) Aircraft and engine rentals fell 21.1% YoY — direct saving; (2) Fuel CASK fell 21.9% because older-gen damp lease aircraft were less fuel-efficient; (3) Supplementary rentals/maintenance may improve as fleet standardises. Worsening lines from owned/finance lease shift: (1) Depreciation up 36.8% — finance leases are depreciated unlike operating leases; (2) Finance costs up 20.6% — interest on lease liabilities recognised; (3) Debt excluding capitalised operating lease liability surged 186.8% (from 75,697 to 217,066 million) — balance sheet leverage increases. Widebody damp leases (Norse): (1) Aircraft rental line partially re-inflates as 6 widebodies come in; (2) But widebody routes (Amsterdam, Manchester) generate international revenue that was previously unserved. Net effect: near-term P&L drag from depreciation and finance costs, with longer-term ownership and network benefits.",
+      "key_facts": [
+        "rentals -21.1%",
+        "fuel CASK -21.9%",
+        "depreciation +36.8%",
+        "finance costs +20.6%",
+        "non-lease debt +186.8%",
+        "widebody rentals re-inflate"
+      ],
+      "source": "indigo_deck.pdf — Cost Breakup, Cash and Debt; indigo_latest_concall_strategy.pdf — CFO fleet/lease commentary, Jinesh Joshi finance lease Q&A, Pulkit Patni rental Q&A",
+      "system_answer": "I couldn't find enough information in the internal documents. Would you like me to search the web for this?",
+      "citations": [],
+      "source_label": "INTERNAL",
+      "needs_web_permission": true,
+      "scores": {
+        "retrieval_precision": 0,
+        "faithfulness": 1,
+        "completeness": 0,
+        "total": 1
+      },
+      "claude_scored": false,
+      "latency_s": 3.06,
+      "timed_out": false
+    },
+    {
+      "id": "Q29",
+      "tier": "T3",
+      "difficulty": "hard",
+      "question": "How does IndiGo's CASK ex-fuel ex-forex guidance for FY26 compare to its actual Q1 FY26 performance, and what is the implied trajectory for the rest of the year?",
+      "expected_answer": "Q1 FY26 CASK ex-fuel ex-forex came in at INR 2.89, up 1.8% from INR 2.84 in Q1 FY25. On a sequential basis (vs Q4 FY25), it was actually down 1.5%, driven by damp lease reductions partially offset by airport charge increases and annual increments. The full-year FY26 guidance is for CASK ex-fuel ex-forex to remain at 'similar levels' to FY25. FY25 was elevated due to significant damp leases taken to offset AOG groundings. With damp leases now being returned, the non-fuel non-forex cost structure is improving. Implied trajectory: Q2 will be softer seasonally but damp lease reductions continue; Q3/Q4 may see cost pressure return if additional damp leases are taken for peak season. The guidance is achievable but depends on (a) AOG numbers not re-escalating and (b) international expansion costs not inflating the base significantly.",
+      "key_facts": [
+        "2.89 Q1 FY26",
+        "2.84 Q1 FY25",
+        "+1.8% YoY",
+        "-1.5% sequential",
+        "FY26 guidance flat vs FY25",
+        "damp leases reducing"
+      ],
+      "source": "indigo_deck.pdf — Cost Breakup, CASK Non-IndAS slide; indigo_latest_concall_strategy.pdf — CFO CASK commentary",
+      "system_answer": "I couldn't find enough information in the internal documents. Would you like me to search the web for this?",
+      "citations": [],
+      "source_label": "INTERNAL",
+      "needs_web_permission": true,
+      "scores": {
+        "retrieval_precision": 0,
+        "faithfulness": 1,
+        "completeness": 0,
+        "total": 1
+      },
+      "claude_scored": false,
+      "latency_s": 3.06,
+      "timed_out": false
+    },
+    {
+      "id": "Q30",
+      "tier": "T3",
+      "difficulty": "hard",
+      "question": "What is the significance of IndiGo hosting the 81st IATA AGM in New Delhi, and how does it connect to the broader strategic narrative in the earnings call?",
+      "expected_answer": "The 81st IATA AGM in New Delhi, attended by the Indian Prime Minister, was significant for three interconnected reasons the CEO highlighted: (1) It validated India as the fastest-growing major aviation market globally; (2) It elevated IndiGo's global stature as an airline shaping international aviation conversations; (3) It served as the platform for announcing the Delta Airlines partnership (transatlantic network access). Strategically, it connects to IndiGo's narrative of transitioning from a domestic LCC to a global aviation player — the same quarter they launched long-haul to Amsterdam and Manchester. The CEO used it to frame IndiGo's ambitions not just as a carrier but as an institution 'giving wings to the nation', linking rising Indian diaspora travel, India as a trade hub, and international aspirational travellers into a single demand thesis. It also provided political tailwind — the India-UK trade agreement (referenced in context of Manchester) and the government's aviation infrastructure push (Jewar, Navi Mumbai airports) suggest policy alignment with IndiGo's expansion.",
+      "key_facts": [
+        "81st IATA AGM",
+        "PM attended",
+        "Delta partnership announced",
+        "fastest growing market",
+        "India-UK agreement",
+        "same quarter as Amsterdam/Manchester"
+      ],
+      "source": "indigo_latest_concall_strategy.pdf — CEO Pieter Elbers opening and Binay Singh Q&A",
+      "system_answer": "### Significance of Hosting the 81st IATA AGM\nThe significance of IndiGo hosting the 81st IATA AGM in New Delhi lies in its recognition as a major aviation market, with India being the fastest-growing major aviation market. This event brought together influential voices shaping the future of the industry and highlighted IndiGo's growing stature on the world stage. \n* It marked a moment of national pride and global significance, with the presence of India's Honorable Prime Minister.\n* The event showcased India's scale, energy, potential, and ambition in the aviation ecosystem, with over 1,700 delegates attending.\n* IndiGo's hosting of the event demonstrated its commitment to driving conversations that will define the next era of aviation.",
+      "citations": [
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 4,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=4",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 11,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=11",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 12,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=12",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 44,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=44",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "indigo latest concall strategy.pdf",
+          "page_number": 6,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/indigo%20latest%20concall%20strategy.pdf#page=6",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 4,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=4",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        },
+        {
+          "document_title": "Indigo.pdf",
+          "page_number": 6,
+          "slide_number": null,
+          "source_url": "https://contentstore12.blob.core.windows.net/container/indigo/Indigo.pdf#page=6",
+          "content_type": "text",
+          "source_label": "INTERNAL",
+          "extracted_caption": ""
+        }
+      ],
+      "source_label": "INTERNAL",
+      "needs_web_permission": false,
+      "scores": {
+        "retrieval_precision": 2,
+        "faithfulness": 2,
+        "completeness": 1,
+        "total": 5
+      },
+      "claude_scored": false,
+      "latency_s": 4.08,
+      "timed_out": false
+    }
+  ]
+}

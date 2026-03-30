@@ -50,16 +50,21 @@ from ingestion.uploader import upload_chunks
 
 STORAGE_ACCOUNT_NAME = os.getenv("AZURE_STORAGE_ACCOUNT_NAME", "")
 CONTAINER_NAME = os.getenv("AZURE_STORAGE_CONTAINER", "documents")
+STORAGE_CONNECTION_STRING = os.getenv("AZURE_STORAGE_CONNECTION_STRING", "")
 
 
 def _get_blob_service_client() -> BlobServiceClient:
     """
-    Return a BlobServiceClient authenticated via Managed Identity (or az login locally).
-    Shared key access is disabled on this subscription — no connection strings or SAS tokens.
-    Content Understanding is granted Storage Blob Data Reader via IAM and fetches blob URLs directly.
+    Return a BlobServiceClient.
+    Prefers AZURE_STORAGE_CONNECTION_STRING (AccountKey auth) when available.
+    Falls back to DefaultAzureCredential (Managed Identity / az login) otherwise.
     """
+    if STORAGE_CONNECTION_STRING:
+        return BlobServiceClient.from_connection_string(STORAGE_CONNECTION_STRING)
     if not STORAGE_ACCOUNT_NAME:
-        raise EnvironmentError("AZURE_STORAGE_ACCOUNT_NAME must be set in .env")
+        raise EnvironmentError(
+            "Either AZURE_STORAGE_CONNECTION_STRING or AZURE_STORAGE_ACCOUNT_NAME must be set in .env"
+        )
     account_url = f"https://{STORAGE_ACCOUNT_NAME}.blob.core.windows.net"
     return BlobServiceClient(account_url=account_url, credential=DefaultAzureCredential())
 

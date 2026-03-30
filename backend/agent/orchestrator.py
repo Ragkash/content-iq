@@ -170,10 +170,18 @@ def run(
     # ── STEP 6b: Post-synthesis confidence check ─────────────────────────────
     # Confidence passed (enough results, scores OK) but the LLM still couldn't
     # ground an answer because the chunks were off-topic. Ask for web permission.
+    # Only trigger when the ENTIRE answer is the "could not find" fallback phrase —
+    # NOT when it appears as a substring inside an otherwise valid answer
+    # (e.g. "I could not find the exact margin, but EBITDAR was 57,386...").
+    _answer_norm = response["answer"].strip().lower()
+    _is_total_failure = (
+        _answer_norm.startswith("i could not find")
+        and len(_answer_norm) < 120
+    )
     if (
         source_label == "INTERNAL"
         and not web_search_enabled
-        and "could not find" in response["answer"].lower()
+        and _is_total_failure
     ):
         logger.info("Post-synthesis: LLM could not ground answer — requesting web search permission.")
         return {

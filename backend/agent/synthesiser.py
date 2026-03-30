@@ -6,10 +6,12 @@ knowledge — it must cite every claim from the provided passages.
 """
 
 import os
+import re
 import logging
 from typing import Any
 
 from dotenv import load_dotenv
+from bs4 import BeautifulSoup
 
 from agent.groq_client import chat_completion, GROQ_MODEL
 
@@ -27,7 +29,9 @@ CRITICAL RULES — you MUST follow all of these:
 4. Do NOT hallucinate document names, page numbers, or facts not in the passages.
 5. Format your answer as Markdown (use bold, bullets, and headers where helpful).
 6. Keep your answer concise — 2-5 sentences or a short list. Do not over-explain.
-
+7. When passages contain table data (pipe-separated rows), extract the EXACT numeric values
+   from the table cells — do NOT round, paraphrase, or approximate them.
+   Prefer table figures over narrative summaries when both are present.
 Your response must contain ONLY the answer text.
 Citations will be added automatically from the retrieved chunk metadata — do not repeat them.
 """.strip()
@@ -42,10 +46,40 @@ Retrieved Passages:
 
 
 
+def _html_to_text(content: str) -> str:
+    """
+    Convert HTML (including tables) to plain readable text so the LLM can
+    extract exact figures from table cells rather than seeing raw HTML markup.
+
+    Table rows are rendered as pipe-separated lines:
+        Header1 | Header2 | Header3
+        val1    | val2    | val3
+    """
+    if "<" not in content:
+        return content  # fast path — no HTML tags
+
+    soup = BeautifulSoup(content, "html.parser")
+
+    # Convert each <table> to pipe-delimited plain text before global tag strip
+    for table in soup.find_all("table"):
+        rows_text = []
+        for row in table.find_all("tr"):
+            cells = [cell.get_text(separator=" ", strip=True) for cell in row.find_all(["th", "td"])]
+            if cells:
+                rows_text.append(" | ".join(cells))
+        table.replace_with("\n" + "\n".join(rows_text) + "\n")
+
+    # Strip remaining tags (headings, spans, etc.) and collapse whitespace
+    text = soup.get_text(separator="\n")
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    return text.strip()
+
+
 def _format_passages(chunks: list[dict[str, Any]]) -> str:
     """
     Format retrieved chunks into a numbered passage list for the LLM context.
     Includes document title and page for grounding transparency.
+    HTML tables are converted to pipe-delimited plain text for accurate extraction.
     """
     lines = []
     for i, chunk in enumerate(chunks, 1):
@@ -60,7 +94,7 @@ def _format_passages(chunks: list[dict[str, Any]]) -> str:
         elif page:
             loc = f" | Page {page}"
 
-        lines.append(f"[{i}] {title}{loc}\n{content.strip()}")
+        lines.append(f"[{i}] {title}{loc}\n{_html_to_text(content).strip()}")
     return "\n\n".join(lines)
 
 
@@ -163,18 +197,22 @@ def synthesise(
     messages: list[dict[str, str]] = [
         {"role": "system", "content": SYNTHESIS_SYSTEM_PROMPT}
     ]
-    # Add last 4 history turns for follow-up context
+    # Add last 4 history turns for multi-turn follow-up context
     if conversation_history:
         messages.extend(conversation_history[-4:])
     messages.append({"role": "user", "content": user_message})
 
-    response = chat_completion(
-        messages=messages,
-        model=GROQ_MODEL,
-        temperature=0.1,    # Low creativity — accuracy over style
-        max_tokens=1024,
-    )
-    answer = response.choices[0].message.content or "I could not find this in our internal documents."
+    try:
+        response = chat_completion(
+            messages=messages,
+            model=GROQ_MODEL,
+            temperature=0.1,    # Low creativity — accuracy over style
+            max_tokens=1024,
+        )
+        answer = response.choices[0].message.content or "I could not find this in our internal documents."
+    except Exception as exc:
+        logger.error("Synthesiser: LLM call failed (%s) — returning fallback.", exc)
+        answer = "I could not find this in our internal documents."
 
     citations = format_citations(retrieved_chunks, source_label)
 

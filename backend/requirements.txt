@@ -36,3 +36,6 @@ pydantic>=2.7.0
 tenacity>=8.3.0     # retry with exponential backoff
 rich>=13.7.0        # pretty CLI logging for ingestion scripts
 pypdf>=4.0.0        # PDF text extraction fallback (no CU required)
+
+# Substack scraper
+beautifulsoup4>=4.12.0  # extract clean text from Substack HTML

@@ -16,6 +16,25 @@ from agent.groq_client import chat_completion, GROQ_MODEL
 load_dotenv()
 logger = logging.getLogger(__name__)
 
+# Used by the parse-failure fallback — simple string match, no LLM needed
+CUSTOMER_NAME_MAP: dict[str, str] = {
+    "indigo":     "indigo",
+    "shell":      "shell",
+    "bp":         "bp",
+    "air india":  "air_india",
+    "air_india":  "air_india",
+    "openai":     "openai",
+}
+
+
+def _extract_customer_fallback(query: str) -> str | None:
+    """Case-insensitive substring match against known customer names."""
+    q = query.lower()
+    for name, tag in CUSTOMER_NAME_MAP.items():
+        if name in q:
+            return tag
+    return None
+
 PARSE_SYSTEM_PROMPT = """
 You are a query understanding assistant for an enterprise document search system used by a consulting firm.
 Extract structured information from the user's query and return a JSON object.
@@ -36,12 +55,36 @@ Return ONLY valid JSON with these exact keys:
 }
 
 CRITICAL Rules:
-- customer / customer_tag ONLY refers to the consulting firm's direct CLIENT whose folder the document lives in (e.g. Shell, IndiGo, Air India, OpenAI).
-  - Set customer_tag ONLY when the user explicitly says "our [client]", "we presented to [client]", "the [client] proposal/deck/report", or similar phrasing that indicates the document BELONGS TO a client.
-  - Do NOT set customer_tag for companies that merely APPEAR IN a document as case study subjects, examples, or references (e.g. Intercom, BBVA, Lowe's, Oscar Health, Moderna, McKinsey, Gartner, etc.).
-  - If unsure whether a company is a direct client or just mentioned in a document, set customer_tag to null.
+- Known clients and their customer_tag values:
+    "IndiGo"    → "indigo"
+    "Shell"     → "shell"
+    "Air India" → "air_india"
+    "BP"        → "bp"
+    "OpenAI"    → "openai"
+- Set customer_tag whenever a known client name appears ANYWHERE in the query — in any phrasing:
+    "What was IndiGo's PAT?"          → customer_tag = "indigo"
+    "Show me Shell's revenue chart"   → customer_tag = "shell"
+    "load factor for IndiGo"          → customer_tag = "indigo"
+    "Air India fleet size"            → customer_tag = "air_india"
+- Also inherit customer_tag from conversation history: if the last user turn established a
+  customer context (e.g. asked about IndiGo) and the current query does NOT introduce a
+  different customer name, carry the same customer_tag forward.
+    History: "What was IndiGo's PAT?" → Current: "What about load factor?" → customer_tag = "indigo"
+- Only leave customer_tag null if the query is genuinely customer-agnostic AND there is no
+  prior customer context in history:
+    "What is EBITDAR?" (no history)   → customer_tag = null
+    "What does the revenue chart show?" (no history) → customer_tag = null
+- Do NOT set customer_tag for companies that are merely referenced as examples or case studies
+  inside documents (e.g. Intercom, BBVA, Lowe's, McKinsey, Gartner) — only for known clients above.
 - "recent" time_constraint → set sort to "last_modified_date desc"
-- Chart/revenue/graph questions → set content_type to "chart"
+- content_type filter — IMPORTANT index constraint:
+    Set content_type to "chart" ONLY when the user explicitly asks about a chart, graph,
+    bar chart, pie chart, visual, or figure (e.g. "show me the revenue chart").
+    Set content_type to "image" ONLY when explicitly asking about an image or photo.
+    NEVER set content_type to "table" — financial tables, metrics, and data are stored
+    as content_type="text" in this index. Setting "table" returns zero results.
+    Leave content_type null for all financial metric questions (PAT, EBITDAR, RASK,
+    load factor, revenue, cost, fleet size, etc.) even though they come from tables.
 - Questions about who wrote/authored something → intent is "get_metadata"
 - Return null for any field you cannot confidently determine
 """.strip()
@@ -101,11 +144,12 @@ def parse_query(
 
     except (json.JSONDecodeError, KeyError, Exception) as e:
         logger.warning("QueryParser failed (%s), using safe defaults.", e)
+        customer_tag = _extract_customer_fallback(user_message)
         return {
             "intent": "find_documents",
             "entities": {"customer": None, "topic": None},
             "time_constraint": None,
-            "metadata_filters": {},
+            "metadata_filters": {"customer_tag": customer_tag},
         }
 
 
