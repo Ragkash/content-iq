@@ -1,6 +1,7 @@
 # Secrets — NEVER commit these
 .env
 *.env
+.env_copy
 
 # Python
 __pycache__/

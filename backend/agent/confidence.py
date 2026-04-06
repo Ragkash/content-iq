@@ -1,23 +1,28 @@
 """
 ContentIQ — Agent: Confidence Evaluator
 Decides whether AI Search results are good enough to answer the user's
-query, or whether we should fall back to Bing web search.
+query, or whether we should fall back to web search.
+
+Design note — why there is no score threshold:
+  The semantic reranker score encodes query-document vocabulary similarity,
+  not answer-ability. When a user says "planes" and the document says
+  "aircraft", the reranker penalises the mismatch and returns a low score
+  even though the chunks are perfectly relevant. Using a score threshold as
+  a pre-filter causes false negatives for any query where user vocabulary
+  diverges from document vocabulary — which happens constantly in enterprise
+  settings ("revenue" vs "turnover", "workers" vs "headcount", etc.).
+
+  The actual quality gate is the post-synthesis check in orchestrator.py:
+  if Llama cannot ground an answer from the retrieved chunks, it says so
+  explicitly and the orchestrator triggers the web fallback at that point.
+  That LLM-based check is the right place to judge answer quality.
 """
 
-import os
 import logging
 from typing import Any
 
-from dotenv import load_dotenv
-
-load_dotenv()
 logger = logging.getLogger(__name__)
 
-# Reranker scores range 0-4. Default threshold of 1.0 filters out poor matches
-# while accepting good semantic matches (typically score 2.0+).
-# The old 0.6 threshold was calibrated for BM25 @search.score (0-1 scale),
-# but we now use @search.reranker_score from Azure semantic reranker (0-4 scale).
-CONFIDENCE_THRESHOLD = float(os.getenv("CONFIDENCE_THRESHOLD", "1.0"))
 MIN_RESULTS_REQUIRED = 2
 
 
@@ -29,12 +34,13 @@ def evaluate(
     Evaluate whether AI Search results are sufficient to answer the user's query.
 
     Returns True  → sufficient, proceed with internal results
-    Returns False → insufficient, fall back to Bing Web Search
+    Returns False → insufficient, fall back to web search
 
-    Fall-back triggers (ANY of these causes False):
+    Fall-back triggers:
     1. Fewer than MIN_RESULTS_REQUIRED (2) chunks returned
-    2. Top result's search score < CONFIDENCE_THRESHOLD (default 0.6)
-    3. A specific customer entity was requested but NO chunk matches that customer_tag
+    2. A specific customer entity was requested but NO chunk matches that customer_tag
+
+    Actual answer quality is judged downstream by the LLM synthesiser.
 
     Args:
         results:         List of result dicts from internal_search.search()
@@ -52,18 +58,7 @@ def evaluate(
         )
         return False
 
-    # ── Trigger 2: Top reranker score below threshold ────────────────────────
-    # Use semantic reranker score (0-4 scale) when available; fall back to
-    # @search.score (RRF fusion, ~0-0.05 scale) only if reranker didn't run.
-    top_score = results[0].get("@search.reranker_score") or results[0].get("@search.score", 0.0)
-    if top_score < CONFIDENCE_THRESHOLD:
-        logger.info(
-            "ConfidenceEvaluator → FAIL: Top score %.3f < threshold %.3f.",
-            top_score, CONFIDENCE_THRESHOLD
-        )
-        return False
-
-    # ── Trigger 3: Customer entity not found in results ───────────────────────
+    # ── Trigger 2: Customer entity not found in results ───────────────────────
     if query_entities:
         # Normalize same way as internal_search: lowercase + spaces → underscores
         requested_customer = (query_entities.get("customer") or "").lower().replace(" ", "_")
@@ -82,8 +77,5 @@ def evaluate(
                 )
                 return False
 
-    logger.info(
-        "ConfidenceEvaluator → PASS: %d results, top score %.3f.",
-        len(results), top_score
-    )
+    logger.info("ConfidenceEvaluator → PASS: %d results.", len(results))
     return True

@@ -8,6 +8,46 @@ import SourceBadge from "../../components/SourceBadge/SourceBadge";
 import styles from "./ContentIQChat.module.css";
 
 /**
+ * CopilotLogo — two gradient C-shaped ribbon halves forming a ring,
+ * inspired by Microsoft Copilot's colour palette and ribbon design.
+ * Uses unique gradient IDs per instance to avoid SVG conflicts.
+ */
+function CopilotLogo({ size = 36, id }: { size?: number; id: string }) {
+    const leftId = `cl-left-${id}`;
+    const rightId = `cl-right-${id}`;
+    return (
+        <svg width={size} height={size} viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Content IQ — Copilot logo">
+            <defs>
+                {/* Left band: Microsoft Blue → Copilot Cyan → Amber */}
+                <linearGradient id={leftId} x1="18" y1="4" x2="18" y2="32" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%"   stopColor="#0078D4" />
+                    <stop offset="48%"  stopColor="#00BCF2" />
+                    <stop offset="100%" stopColor="#FFB900" />
+                </linearGradient>
+                {/* Right band: Copilot Purple → Rose → Tangerine */}
+                <linearGradient id={rightId} x1="18" y1="4" x2="18" y2="32" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%"   stopColor="#7B2FBE" />
+                    <stop offset="55%"  stopColor="#D83B8A" />
+                    <stop offset="100%" stopColor="#FF6B35" />
+                </linearGradient>
+            </defs>
+            {/*
+              Left C-band (opens right):
+                Outer arc CCW from top(18,4) → left side → bottom(18,32)
+                Inner arc CW  from bottom-inner(18,25) → left side → top-inner(18,11)
+            */}
+            <path d="M18 4 A14 14 0 1 0 18 32 L18 25 A7 7 0 1 1 18 11 Z" fill={`url(#${leftId})`} />
+            {/*
+              Right C-band (opens left):
+                Outer arc CW  from top(18,4) → right side → bottom(18,32)
+                Inner arc CCW from bottom-inner(18,25) → right side → top-inner(18,11)
+            */}
+            <path d="M18 4 A14 14 0 1 1 18 32 L18 25 A7 7 0 1 0 18 11 Z" fill={`url(#${rightId})`} />
+        </svg>
+    );
+}
+
+/**
  * ContentIQChat — main chat interface for the Content IQ agent.
  *
  * Two web search modes:
@@ -29,6 +69,16 @@ export default function ContentIQChat() {
     const [webSearchEnabled, setWebSearchEnabled] = useState(false);
     // Holds the query that triggered a low-confidence result, waiting for consent.
     const [pendingWebQuery, setPendingWebQuery] = useState<string | null>(null);
+    // Tracks which message indices have their citations panel open.
+    const [expandedCitations, setExpandedCitations] = useState<Set<number>>(new Set());
+
+    const toggleCitations = (idx: number) => {
+        setExpandedCitations(prev => {
+            const next = new Set(prev);
+            next.has(idx) ? next.delete(idx) : next.add(idx);
+            return next;
+        });
+    };
     const conversationIdRef = useRef<string>(uuidv4());
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -137,7 +187,9 @@ export default function ContentIQChat() {
             {/* ── Header ── */}
             <header className={styles.header}>
                 <div className={styles.headerLeft}>
-                    <span className={styles.logo}>🔍</span>
+                    <div className={styles.logo}>
+                        <CopilotLogo size={36} id="header" />
+                    </div>
                     <div>
                         <h1 className={styles.title}>Content IQ</h1>
                         <p className={styles.subtitle}>Enterprise Document Intelligence</p>
@@ -175,7 +227,9 @@ export default function ContentIQChat() {
             <main className={styles.messages} role="log" aria-live="polite" aria-label="Chat messages">
                 {messages.length === 0 && !isLoading && (
                     <div className={styles.emptyState}>
-                        <div className={styles.emptyIcon}>📂</div>
+                        <div className={styles.emptyIconWrap}>
+                            <CopilotLogo size={72} id="empty" />
+                        </div>
                         <h2>Ask anything about your documents</h2>
                         <p>Content IQ searches your internal documents and cites every answer. Enable Web Search to query the web.</p>
                         <div className={styles.exampleQueries}>
@@ -238,14 +292,30 @@ export default function ContentIQChat() {
 
                                 {msg.citations && msg.citations.length > 0 && (
                                     <div className={styles.citations}>
-                                        <p className={styles.citationsLabel}>
-                                            Sources ({msg.citations.length})
-                                        </p>
-                                        <div className={styles.citationGrid}>
-                                            {msg.citations.map((c: Citation, ci: number) => (
-                                                <CitationCard key={ci} citation={c} />
-                                            ))}
-                                        </div>
+                                        <button
+                                            className={styles.citationsToggle}
+                                            onClick={() => toggleCitations(idx)}
+                                            aria-expanded={expandedCitations.has(idx)}
+                                        >
+                                            <span className={styles.citationsToggleLabel}>
+                                                {msg.citations.length} {msg.citations.length === 1 ? "Source" : "Sources"}
+                                            </span>
+                                            <svg
+                                                className={`${styles.citationsChevron} ${expandedCitations.has(idx) ? styles.citationsChevronOpen : ""}`}
+                                                width="14" height="14" viewBox="0 0 14 14" fill="none"
+                                                xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+                                            >
+                                                <path d="M3 5 L7 9 L11 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                            </svg>
+                                        </button>
+
+                                        {expandedCitations.has(idx) && (
+                                            <div className={styles.citationGrid}>
+                                                {msg.citations.map((c: Citation, ci: number) => (
+                                                    <CitationCard key={ci} citation={c} />
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                             </div>

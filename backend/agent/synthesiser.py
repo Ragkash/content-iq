@@ -29,9 +29,27 @@ CRITICAL RULES — you MUST follow all of these:
 4. Do NOT hallucinate document names, page numbers, or facts not in the passages.
 5. Format your answer as Markdown (use bold, bullets, and headers where helpful).
 6. Keep your answer concise — 2-5 sentences or a short list. Do not over-explain.
-7. When passages contain table data (pipe-separated rows), extract the EXACT numeric values
-   from the table cells — do NOT round, paraphrase, or approximate them.
-   Prefer table figures over narrative summaries when both are present.
+7. When passages contain pipe-separated rows, treat them as structured table data. Each row
+   may have any number of columns. Read the header row first to understand what each column
+   represents, then read every data row. Extract the exact value from the correct column for
+   the metric being asked about. Do not skip rows, do not approximate values, and do not
+   prefer narrative text over table data. If a value exists in a pipe-separated row, you MUST
+   use that exact value. You cannot say "not explicitly stated" if the value is present in
+   any pipe-separated row in the retrieved passages.
+8. When the answer involves financial metrics, percentages, or numerical figures, always quote
+   the exact number as it appears in the source table. Never round, never approximate, never
+   paraphrase a number. If the source says 84.6%, write 84.6%. If it says 21,763 million,
+   write 21,763 million. Do not convert to billions unless the source itself uses billions.
+   When multiple passages contain figures for the same metric but from different time periods
+   or documents, prefer the most recent quarterly earnings document over annual reports or
+   older filings.
+9. When a question asks how a metric compares YoY or to a prior period, you must state BOTH
+   the current period figure AND the prior period figure AND the change. If any of the three
+   is missing from the retrieved passages, say so explicitly — do not omit the comparison.
+10. When passages contain multiple figures that represent different subcategories of the same
+    concept (e.g. different types of destinations, different lease types, different revenue
+    streams), report each subcategory separately with its own figure. Never combine or
+    conflate subcategory figures into a single number.
 Your response must contain ONLY the answer text.
 Citations will be added automatically from the retrieved chunk metadata — do not repeat them.
 """.strip()
@@ -80,7 +98,15 @@ def _format_passages(chunks: list[dict[str, Any]]) -> str:
     Format retrieved chunks into a numbered passage list for the LLM context.
     Includes document title and page for grounding transparency.
     HTML tables are converted to pipe-delimited plain text for accurate extraction.
+    Chunks are sorted so table/chart content appears before narrative text,
+    ensuring the LLM sees structured figures first.
     """
+    TYPE_ORDER = {"table": 0, "chart": 1, "text": 2}
+    chunks = sorted(
+        chunks,
+        key=lambda c: TYPE_ORDER.get(c.get("content_type", "text"), 3)
+    )
+
     lines = []
     for i, chunk in enumerate(chunks, 1):
         title = chunk.get("document_title", "Unknown")
@@ -206,7 +232,7 @@ def synthesise(
         response = chat_completion(
             messages=messages,
             model=GROQ_MODEL,
-            temperature=0.1,    # Low creativity — accuracy over style
+            temperature=0.0,    # Deterministic — accuracy over style
             max_tokens=1024,
         )
         answer = response.choices[0].message.content or "I could not find this in our internal documents."

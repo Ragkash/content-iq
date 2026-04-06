@@ -1,3 +1,7 @@
+# DEPLOYED TO AZURE: This file is read by Azure's Oryx build system during deployment.
+# Every package listed here gets pip-installed on Azure's Linux server so the scraper
+# can run. Without this file Azure would have no dependencies and the function would crash
+# on every import statement.
 azure-functions
 azure-storage-blob>=12.20.0
 azure-search-documents>=11.6.0

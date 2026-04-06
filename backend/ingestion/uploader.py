@@ -21,7 +21,7 @@ SEARCH_ENDPOINT = os.getenv("AZURE_SEARCH_ENDPOINT", "")
 SEARCH_KEY = os.getenv("AZURE_SEARCH_KEY", "")
 INDEX_NAME = os.getenv("AZURE_SEARCH_INDEX_NAME", "content-iq-index")
 
-BATCH_SIZE = 100  # Number of chunks per upload batch (AI Search limit: 1000, we stay safe)
+BATCH_SIZE = 100
 
 
 def get_search_client() -> SearchClient:
@@ -40,11 +40,6 @@ def upload_chunks(chunks: list[dict[str, Any]], dry_run: bool = False) -> int:
     """
     Embed and upload a list of ContentIQ chunks to Azure AI Search.
 
-    For each chunk:
-      1. Calls embed_batch() to generate content_vector in bulk (efficient API usage)
-      2. Sets content_vector on each chunk
-      3. Batch-uploads to the AI Search index
-
     Args:
         chunks:  List of chunk dicts from chunker.chunk_document()
         dry_run: If True, embed and validate but do NOT upload to the index.
@@ -58,11 +53,9 @@ def upload_chunks(chunks: list[dict[str, Any]], dry_run: bool = False) -> int:
 
     logger.info("Embedding %d chunks...", len(chunks))
 
-    # Extract texts for batch embedding
     texts = [c["content"] for c in chunks]
     embeddings = embed_batch(texts)
 
-    # Attach vectors back to chunks
     for chunk, vector in zip(chunks, embeddings):
         chunk["content_vector"] = vector
 
@@ -71,7 +64,6 @@ def upload_chunks(chunks: list[dict[str, Any]], dry_run: bool = False) -> int:
         _validate_chunks(chunks)
         return len(chunks)
 
-    # ── Upload in batches ─────────────────────────────────────────────────────
     client = get_search_client()
     total_uploaded = 0
 
@@ -85,17 +77,12 @@ def upload_chunks(chunks: list[dict[str, Any]], dry_run: bool = False) -> int:
         )
         result = client.upload_documents(documents=batch)
 
-        # Count successes
         succeeded = sum(1 for r in result if r.succeeded)
         failed = len(batch) - succeeded
         total_uploaded += succeeded
 
         if failed > 0:
-            logger.warning(
-                "%d chunks FAILED to upload in this batch. "
-                "Check document keys and schema alignment.",
-                failed,
-            )
+            logger.warning("%d chunks FAILED to upload in this batch.", failed)
         else:
             logger.info("Batch uploaded successfully (%d chunks).", succeeded)
 
@@ -104,10 +91,6 @@ def upload_chunks(chunks: list[dict[str, Any]], dry_run: bool = False) -> int:
 
 
 def _validate_chunks(chunks: list[dict[str, Any]]) -> None:
-    """
-    Validate that all required ContentIQ fields are present in chunks.
-    Raises ValueError if any required field is missing.
-    """
     REQUIRED_FIELDS = {
         "id", "content", "content_vector", "document_title", "source_url",
         "customer_tag", "content_type", "chunk_index", "allowed_groups",
@@ -120,10 +103,3 @@ def _validate_chunks(chunks: list[dict[str, Any]]) -> None:
     if errors:
         raise ValueError("Chunk validation failed:\n" + "\n".join(errors))
     logger.info("All %d chunks passed validation.", len(chunks))
-
-
-# ─── CLI helper ───────────────────────────────────────────────────────────────
-if __name__ == "__main__":
-    import sys, json
-    print("uploader.py: import this module from ingest_all.py")
-    print("Or test with: from uploader import upload_chunks")

@@ -1,6 +1,10 @@
 """
 ContentIQ — Ingestion: Text Embedder
 Generates 1536-dim embeddings using Azure OpenAI text-embedding-ada-002.
+
+DEPLOYED TO AZURE: This is a copy of backend/ingestion/embedder.py placed here because
+when Azure deploys the scraper/ folder, it has no access to the parent ingestion/ directory.
+Copying it here ensures the scraper can embed chunks in Azure exactly as it does locally.
 """
 
 import os

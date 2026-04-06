@@ -37,20 +37,9 @@ def _get_search_client() -> SearchClient:
 
 
 def _build_filter(metadata_filters: dict[str, Any]) -> str | None:
-    """
-    Build an OData filter expression from ContentIQ metadata filters.
-
-    Supported filters:
-        customer_tag  → "customer_tag eq 'Shell'"
-        content_type  → "content_type eq 'chart'"
-
-    Returns OData filter string or None if no filters.
-    """
     clauses = []
     customer = metadata_filters.get("customer_tag")
     if customer:
-        # Normalize to match how customer_tag is stored (folder name: lowercase, spaces→underscores)
-        # e.g. "Air India" → "air_india", "IndiGo" → "indigo"
         safe_customer = customer.lower().replace(" ", "_").replace("'", "''")
         clauses.append(f"customer_tag eq '{safe_customer}'")
 
@@ -69,28 +58,26 @@ def search(
 ) -> list[dict[str, Any]]:
     """
     Run hybrid (vector + keyword) search against the ContentIQ AI Search index.
-
-    Args:
-        query:            Natural language search query (or optimised keyword query).
-        metadata_filters: Dict from QueryParser containing customer_tag, content_type, sort.
-        top:              Max number of results to return.
-
-    Returns:
-        List of result dicts, each containing all ContentIQ metadata fields
-        plus "@search.score" and "@search.reranker_score".
     """
     if not query.strip():
         return []
 
     filters = metadata_filters or {}
     odata_filter = _build_filter(filters)
-    sort_by = filters.get("sort")  # e.g. "last_modified_date desc"
+    sort_by = filters.get("sort")
 
-    # Build vector query from the text embedding of the query
     query_vector = embed_text(query)
     vector_query = VectorizedQuery(
         vector=query_vector,
-        k_nearest_neighbors=top * 2,     # retrieve more candidates, let RRF re-rank
+        # Use a large fixed candidate pool regardless of TOP_K.
+        # Azure's semantic reranker considers only the top 50 documents from the
+        # merged BM25+vector candidate pool. When BM25 contributes zero hits
+        # (e.g. user says "planes", document says "aircraft"), the pool is
+        # entirely from vector search. With k=top*2=30, a relevant chunk at
+        # vector rank 31 never reaches the reranker at all. Setting k=100
+        # ensures the right chunks are in Azure's reranker pool even when
+        # vocabulary mismatch zeros out the BM25 contribution.
+        k_nearest_neighbors=100,
         fields="content_vector",
     )
 
@@ -102,21 +89,20 @@ def search(
     client = _get_search_client()
 
     search_kwargs: dict[str, Any] = {
-        "search_text": query,           # BM25 keyword component
-        "vector_queries": [vector_query],  # Vector component
-        "select": [                     # Only retrieve needed fields
+        "search_text": query,
+        "vector_queries": [vector_query],
+        "select": [
             "id", "content", "document_title", "source_url",
             "page_number", "slide_number", "content_type",
             "customer_tag", "author", "last_modified_date",
             "chunk_index", "extracted_caption",
         ],
         "top": top,
-        "query_type": "semantic",       # Enable semantic ranking (RRF + reranker)
+        "query_type": "semantic",
         "semantic_configuration_name": "default",
     }
     if odata_filter:
         search_kwargs["filter"] = odata_filter
-    # order_by is not supported when query_type="semantic"; ignore sort requests
 
     seen_ids: set[str] = set()
     results = []
@@ -127,7 +113,6 @@ def search(
         if doc_id:
             seen_ids.add(doc_id)
         result = dict(item)
-        # Ensure score fields are present for ConfidenceEvaluator
         result["@search.score"] = item.get("@search.score", 0.0)
         result["@search.reranker_score"] = item.get("@search.reranker_score", 0.0)
         results.append(result)
@@ -136,7 +121,6 @@ def search(
     return results
 
 
-# ─── CLI test ─────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     import sys
     q = " ".join(sys.argv[1:]) if len(sys.argv) > 1 else "Shell digital transformation"

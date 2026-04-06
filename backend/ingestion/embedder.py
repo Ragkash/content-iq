@@ -44,33 +44,16 @@ def _get_client() -> AzureOpenAI:
     reraise=True,
 )
 def embed_text(text: str) -> list[float]:
-    """
-    Embed a single string using text-embedding-ada-002.
-
-    Args:
-        text: The string to embed (max ~8191 tokens for ada-002).
-
-    Returns:
-        A list of 1536 floats representing the embedding vector.
-    """
+    """Embed a single string using text-embedding-ada-002."""
     client = _get_client()
-    response = client.embeddings.create(
-        model=EMB_DEPLOYMENT,
-        input=text,
-    )
+    response = client.embeddings.create(model=EMB_DEPLOYMENT, input=text)
     return response.data[0].embedding
 
 
 def embed_batch(texts: Sequence[str]) -> list[list[float]]:
     """
     Embed multiple strings in a single API call (more efficient than looping).
-    Ada-002 supports up to 2048 items per batch but we cap at 100 for safety.
-
-    Args:
-        texts: Sequence of strings to embed.
-
-    Returns:
-        List of embedding vectors in the same order as inputs.
+    Ada-002 supports up to 2048 items per batch; we cap at 100 for safety.
     """
     if not texts:
         return []
@@ -83,19 +66,15 @@ def embed_batch(texts: Sequence[str]) -> list[list[float]]:
         logger.debug("Embedding batch %d–%d of %d", i, i + len(batch), len(texts))
 
         client = _get_client()
-        response = client.embeddings.create(
-            model=EMB_DEPLOYMENT,
-            input=batch,
-        )
-        # API returns items sorted by index
+        response = client.embeddings.create(model=EMB_DEPLOYMENT, input=batch)
         sorted_data = sorted(response.data, key=lambda x: x.index)
         all_embeddings.extend([item.embedding for item in sorted_data])
 
     return all_embeddings
 
 
-# ─── CLI test helper ─────────────────────────────────────────────────────────
 if __name__ == "__main__":
+    import sdk_patch  # noqa: F401
     test_text = "Shell digital transformation proposal Q4 2024"
     print(f"Embedding: '{test_text}'")
     embedding = embed_text(test_text)

@@ -131,13 +131,17 @@ class SessionStore:
             )
             return False
 
-        # Check whether the message looks like a genuine follow-up refinement
+        # Check whether the message looks like a genuine follow-up refinement.
+        # Require BOTH short (≤5 words) AND a signal word, or just a signal word
+        # on its own. The old ≤8-word-only check was too broad — 7-word queries
+        # like "Name all the aircrafts that indigo uses" are substantive new
+        # questions, not follow-ups.
         words = user_message.lower().split()
-        is_short = len(words) <= 8
         starts_with_signal = bool(words) and any(
             user_message.lower().startswith(signal)
             for signal in self._FOLLOWUP_SIGNALS
         )
+        is_short = len(words) <= 5
 
         if not (is_short or starts_with_signal):
             logger.info(

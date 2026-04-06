@@ -11,6 +11,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 import tiktoken
+from bs4 import BeautifulSoup
 
 logger = logging.getLogger(__name__)
 
@@ -181,6 +182,44 @@ _CU_ARTIFACT_RE = re.compile(
     r'|<figcaption[^>]*>.*?</figcaption>',                  # figure captions inside figure blocks
     re.DOTALL | re.IGNORECASE,
 )
+
+
+def _strip_html_to_text(content: str) -> str:
+    """
+    Convert HTML table markup to pipe-delimited plain text before indexing.
+
+    Table rows become:
+        Header1 | Header2 | Header3
+        val1    | val2    | val3
+
+    Cells with rowspan/colspan are included as-is (BeautifulSoup reads their
+    text regardless of span attributes). Remaining non-table HTML tags are
+    stripped so only clean text is stored in the index.
+
+    Returns content unchanged when no HTML tags are present (fast path).
+    """
+    if "<" not in content:
+        return content
+
+    soup = BeautifulSoup(content, "html.parser")
+
+    for table in soup.find_all("table"):
+        rows_text = []
+        for row in table.find_all("tr"):
+            cells = [
+                cell.get_text(separator=" ", strip=True)
+                for cell in row.find_all(["th", "td"])
+            ]
+            if cells:
+                rows_text.append(" | ".join(cells))
+        table.replace_with("\n" + "\n".join(rows_text) + "\n")
+
+    text = soup.get_text(separator="\n")
+    text = re.sub(r'\|\s*\|', '|', text)           # collapse empty pipe cells
+    text = re.sub(r'^\s*\|\s*', '', text, flags=re.MULTILINE)   # strip leading pipes
+    text = re.sub(r'\s*\|\s*$', '', text, flags=re.MULTILINE)   # strip trailing pipes
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    return text.strip()
 
 
 def _clean_markdown(markdown: str) -> str:
@@ -378,6 +417,7 @@ def chunk_document(
 
     for page_num, raw_page_text in page_segments:
         page_text = _clean_markdown(raw_page_text)
+        page_text = _strip_html_to_text(page_text)
         if not page_text.strip():
             continue
 

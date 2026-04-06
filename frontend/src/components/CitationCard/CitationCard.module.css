@@ -5,40 +5,45 @@
     gap: 12px;
     padding: 10px 14px;
     border-radius: 8px;
-    border: 1px solid transparent;
+    border: 1px solid #D1D1D1;
+    background: #FFFFFF;
     cursor: pointer;
-    transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.15s ease;
+    transition: transform 150ms cubic-bezier(0.33, 1, 0.68, 1),
+                box-shadow 150ms cubic-bezier(0.33, 1, 0.68, 1),
+                background 150ms cubic-bezier(0.33, 1, 0.68, 1);
     text-decoration: none;
     user-select: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 0 2px rgba(0, 0, 0, 0.12);
 }
 
 .card:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.14), 0 0 2px rgba(0, 0, 0, 0.12);
 }
 
 .card:active {
     transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 0 2px rgba(0, 0, 0, 0.12);
 }
 
-/* INTERNAL: subtle blue tint */
+/* INTERNAL: blue left accent border + light brand tint */
 .internal {
-    background: #f0f6ff;
-    border-color: #c7dcff;
+    border-left: 3px solid #0078D4;
+    background: #EBF3FC;
 }
 
 .internal:hover {
-    background: #e4efff;
+    background: #C7E0F4;
 }
 
-/* WEB: subtle orange tint */
+/* WEB: gold left accent border + warm tint */
 .web {
-    background: #fff8f0;
-    border-color: #ffd8aa;
+    border-left: 3px solid #C19C00;
+    background: #FFF4CE;
 }
 
 .web:hover {
-    background: #fff0e0;
+    background: #FDEAA8;
 }
 
 .left {
@@ -50,7 +55,7 @@
 }
 
 .icon {
-    font-size: 18px;
+    font-size: 17px;
     flex-shrink: 0;
     line-height: 1;
 }
@@ -64,7 +69,7 @@
 .title {
     font-size: 13px;
     font-weight: 600;
-    color: #1a1a2e;
+    color: #242424;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -72,7 +77,7 @@
 
 .location {
     font-size: 11px;
-    color: #6b7280;
+    color: #616161;
     margin-top: 1px;
 }
 
@@ -85,5 +90,6 @@
 
 .externalIcon {
     font-size: 13px;
-    color: #9ca3af;
+    color: #0078D4;
+    font-weight: 600;
 }

@@ -59,12 +59,6 @@ def create_or_update_index() -> None:
     """
     Create the ContentIQ AI Search index if it doesn't exist, or update
     the schema if new fields are needed.
-
-    Index schema includes:
-    - Standard RAG fields (id, content, content_vector)
-    - ContentIQ metadata fields (customer_tag, page_number, author, etc.)
-    - Access control placeholder (allowed_groups) for v2 RBAC readiness
-    - Semantic search config with document_title + content + extracted_caption
     """
     client = get_index_client()
 
@@ -90,15 +84,6 @@ def create_or_update_index() -> None:
         name="hnsw_config",
         parameters=HnswParameters(metric="cosine"),
     )
-    # ⚠️  IMPORTANT — Azure Search Tier Requirement:
-    # BinaryQuantizationCompression requires S1 tier or higher.
-    # FREE and BASIC tiers will return 400 Bad Request when create_index() is called.
-    # When you provision Azure AI Search in P0, choose:
-    #   - S1  (recommended for POC — ~$245/month)
-    #   - S2/S3 for production
-    # If you only have a Basic tier available for testing, remove the
-    # 'compression_name' from vector_profile and remove the 'compression'
-    # object from VectorSearch() below to fall back to flat HNSW (no compression).
     compression = BinaryQuantizationCompression(
         compression_name="content_vector-compression",
         truncation_dimension=1024,
@@ -119,19 +104,8 @@ def create_or_update_index() -> None:
 
     # ── Field definitions ─────────────────────────────────────────────────────
     fields: list[Any] = [
-        # Core RAG fields
-        SimpleField(
-            name="id",
-            type="Edm.String",
-            key=True,
-            filterable=True,
-            sortable=True,
-        ),
-        SearchableField(
-            name="content",
-            type="Edm.String",
-            analyzer_name="en.microsoft",
-        ),
+        SimpleField(name="id", type="Edm.String", key=True, filterable=True, sortable=True),
+        SearchableField(name="content", type="Edm.String", analyzer_name="en.microsoft"),
         SearchField(
             name="content_vector",
             type=SearchFieldDataType.Collection(SearchFieldDataType.Single),
@@ -144,75 +118,17 @@ def create_or_update_index() -> None:
             vector_search_profile_name="content_vector-profile",
             stored=False,
         ),
-
-        # ── ContentIQ metadata fields ─────────────────────────────────────────
-        SearchableField(
-            name="document_title",
-            type="Edm.String",
-            filterable=True,
-            facetable=False,
-        ),
-        SimpleField(
-            name="source_url",
-            type="Edm.String",
-            filterable=True,
-            facetable=False,
-        ),
-        SimpleField(
-            name="page_number",
-            type="Edm.Int32",
-            filterable=True,
-            sortable=True,
-        ),
-        SimpleField(
-            name="slide_number",
-            type="Edm.Int32",
-            filterable=True,
-            sortable=True,
-        ),
-        SimpleField(
-            name="content_type",
-            type="Edm.String",
-            filterable=True,
-            facetable=True,
-        ),
-        SimpleField(
-            name="customer_tag",
-            type="Edm.String",
-            filterable=True,
-            facetable=True,
-        ),
-        SearchableField(
-            name="author",
-            type="Edm.String",
-            filterable=True,
-            facetable=False,
-        ),
-        SimpleField(
-            name="created_date",
-            type="Edm.DateTimeOffset",
-            filterable=True,
-            sortable=True,
-        ),
-        SimpleField(
-            name="last_modified_date",
-            type="Edm.DateTimeOffset",
-            filterable=True,
-            sortable=True,
-        ),
-        SimpleField(
-            name="chunk_index",
-            type="Edm.Int32",
-            filterable=True,
-            sortable=True,
-        ),
-        SearchableField(
-            name="extracted_caption",
-            type="Edm.String",
-            filterable=False,
-            facetable=False,
-        ),
-        # v2 RBAC placeholder — set to ["all"] for every chunk in v1
+        SearchableField(name="document_title", type="Edm.String", filterable=True, facetable=False),
+        SimpleField(name="source_url", type="Edm.String", filterable=True, facetable=False),
+        SimpleField(name="page_number", type="Edm.Int32", filterable=True, sortable=True),
+        SimpleField(name="slide_number", type="Edm.Int32", filterable=True, sortable=True),
+        SimpleField(name="content_type", type="Edm.String", filterable=True, facetable=True),
+        SimpleField(name="customer_tag", type="Edm.String", filterable=True, facetable=True),
+        SearchableField(name="author", type="Edm.String", filterable=True, facetable=False),
+        SimpleField(name="created_date", type="Edm.DateTimeOffset", filterable=True, sortable=True),
+        SimpleField(name="last_modified_date", type="Edm.DateTimeOffset", filterable=True, sortable=True),
+        SimpleField(name="chunk_index", type="Edm.Int32", filterable=True, sortable=True),
+        SearchableField(name="extracted_caption", type="Edm.String", filterable=False, facetable=False),
         SearchField(
             name="allowed_groups",
             type=SearchFieldDataType.Collection(SearchFieldDataType.String),
@@ -236,7 +152,6 @@ def create_or_update_index() -> None:
         ],
     )
 
-    # ── Assemble VectorSearch ─────────────────────────────────────────────────
     vectorizers = [vectorizer] if vectorizer else []
     vector_search = VectorSearch(
         algorithms=[hnsw_algo],
@@ -245,7 +160,6 @@ def create_or_update_index() -> None:
         vectorizers=vectorizers if vectorizers else None,
     )
 
-    # ── Create index ──────────────────────────────────────────────────────────
     index = SearchIndex(
         name=INDEX_NAME,
         fields=fields,
@@ -275,7 +189,7 @@ def _ensure_fields(client: SearchIndexClient) -> None:
     }
     for field_name, field_def in expected.items():
         if field_name not in existing_names:
-            logger.info("Adding missing field '%s' to index '%s'.", field_name, INDEX_NAME)
+            logger.info("Adding missing field '%s' to index.", field_name)
             new_fields.append(field_def)
 
     if new_fields:
@@ -286,8 +200,8 @@ def _ensure_fields(client: SearchIndexClient) -> None:
         logger.info("Index schema is up to date.")
 
 
-# ─── CLI helper ───────────────────────────────────────────────────────────────
 if __name__ == "__main__":
+    import sdk_patch  # noqa: F401 — apply timeouts before SDK calls
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
     create_or_update_index()
     print(f"Index '{INDEX_NAME}' is ready.")

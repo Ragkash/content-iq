@@ -2,6 +2,10 @@
 ContentIQ — Ingestion: Chunk Uploader
 Takes chunked documents (output of chunker.py), embeds each chunk's content,
 and batch-uploads everything to the Azure AI Search index.
+
+DEPLOYED TO AZURE: This is a copy of backend/ingestion/uploader.py placed here because
+when Azure deploys the scraper/ folder, it has no access to the parent ingestion/ directory.
+Copying it here ensures the scraper can upload chunks to AI Search in Azure exactly as it does locally.
 """
 
 import os

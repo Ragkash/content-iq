@@ -1,23 +1,23 @@
 .badge {
     display: inline-flex;
     align-items: center;
-    padding: 2px 8px;
-    border-radius: 9999px;
+    padding: 2px 7px;
+    border-radius: 4px;
     font-size: 10px;
     font-weight: 700;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     white-space: nowrap;
 }
 
-/* INTERNAL: Blue — from internal documents */
+/* INTERNAL: Microsoft Blue — sourced from internal documents */
 .internal {
-    background-color: #1d4ed8;
-    color: #ffffff;
+    background-color: #0078D4;
+    color: #FFFFFF;
 }
 
-/* WEB: Orange — from Bing external search */
+/* WEB: Gold/Warning — sourced from external web search */
 .web {
-    background-color: #ea580c;
-    color: #ffffff;
+    background-color: #C19C00;
+    color: #3D2D00;
 }

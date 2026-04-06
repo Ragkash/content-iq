@@ -18,10 +18,22 @@ Usage:
 """
 
 import argparse
+import datetime
+import json
 import logging
 import os
 import sys
+import uuid
 
+# ── Apply SDK timeout patches before any Azure/OpenAI imports ────────────────
+# Fixes indefinite hang on networks with slow proxy auto-detection (Windows).
+# See backend/sdk_patch.py for details.
+_backend_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, _backend_dir)
+import sdk_patch  # noqa: F401, E402
+# ─────────────────────────────────────────────────────────────────────────────
+
+import tiktoken
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
 from dotenv import load_dotenv
@@ -31,7 +43,6 @@ from rich.progress import Progress, SpinnerColumn, TextColumn
 
 load_dotenv()
 
-# Use rich for pretty CLI output
 console = Console()
 logging.basicConfig(
     level=logging.INFO,
@@ -39,9 +50,6 @@ logging.basicConfig(
     handlers=[RichHandler(console=console, markup=True, rich_tracebacks=True)],
 )
 logger = logging.getLogger(__name__)
-
-# Add backend dir to path so we can import ingestion modules
-sys.path.insert(0, os.path.dirname(__file__))
 
 from ingestion.indexer import create_or_update_index
 from ingestion.analyzer import analyze_document, extract_text_pypdf
@@ -54,11 +62,6 @@ STORAGE_CONNECTION_STRING = os.getenv("AZURE_STORAGE_CONNECTION_STRING", "")
 
 
 def _get_blob_service_client() -> BlobServiceClient:
-    """
-    Return a BlobServiceClient.
-    Prefers AZURE_STORAGE_CONNECTION_STRING (AccountKey auth) when available.
-    Falls back to DefaultAzureCredential (Managed Identity / az login) otherwise.
-    """
     if STORAGE_CONNECTION_STRING:
         return BlobServiceClient.from_connection_string(STORAGE_CONNECTION_STRING)
     if not STORAGE_ACCOUNT_NAME:
@@ -70,18 +73,13 @@ def _get_blob_service_client() -> BlobServiceClient:
 
 
 def list_blob_files() -> list[dict]:
-    """List all files in the Blob container with their blob URL and path."""
+    """List all files in the Blob container."""
     client = _get_blob_service_client()
     container = client.get_container_client(CONTAINER_NAME)
 
     files = []
     for blob in container.list_blobs():
         blob_client = container.get_blob_client(blob.name)
-        # blob.name     = path within container, e.g. "customers/Shell/file.pdf"
-        #                 Passed as file_path → used for customer_tag extraction
-        # blob_client.url = "https://<account>.blob.core.windows.net/<container>/customers/Shell/file.pdf"
-        #                   Sent to CU as the document URL and stored as source_url in the index.
-        #                   CU accesses it using its own Managed Identity (Storage Blob Data Reader on IAM).
         files.append({
             "file_path": blob.name,
             "blob_url": blob_client.url,
@@ -91,22 +89,87 @@ def list_blob_files() -> list[dict]:
 
 
 def get_blob_metadata(blob_info: dict) -> dict:
-    """Extract metadata from blob properties for the chunk schema."""
-    import datetime
     now_utc = datetime.datetime.now(datetime.timezone.utc).isoformat()
     return {
         "last_modified_date": (
             blob_info["last_modified"].isoformat()
-            if blob_info.get("last_modified")
-            else now_utc
+            if blob_info.get("last_modified") else now_utc
         ),
         "created_date": (
             blob_info["last_modified"].isoformat()
-            if blob_info.get("last_modified")
-            else now_utc
+            if blob_info.get("last_modified") else now_utc
         ),
-        "author": "",  # CU can extract this from document metadata
+        "author": "",
     }
+
+
+def _ingest_substack_json(blob_info: dict, dry_run: bool = False) -> int:
+    """
+    Ingest a Substack post JSON blob into AI Search.
+    JSON schema (written by substack_scraper.py):
+        { title, url, content, published_date, subtitle, author, ... }
+    """
+    file_path = blob_info["file_path"]
+    now = datetime.datetime.now(datetime.timezone.utc).isoformat()
+
+    client = _get_blob_service_client()
+    blob_client = client.get_container_client(CONTAINER_NAME).get_blob_client(file_path)
+    raw = blob_client.download_blob().readall().decode("utf-8")
+    post = json.loads(raw)
+
+    content = post.get("content", "").strip()
+    if not content:
+        logger.warning("  JSON has no content field — skipping %s", file_path)
+        return 0
+
+    title    = post.get("title", file_path.split("/")[-1].replace(".json", ""))
+    url      = post.get("url", "")
+    subtitle = post.get("subtitle", "")
+    author   = post.get("author", "Sandeep Alur")
+    pub_date = post.get("published_date") or post.get("scraped_at") or now
+
+    enc = tiktoken.get_encoding("cl100k_base")
+    tokens = enc.encode(content)
+    CHUNK_SIZE, OVERLAP = 500, 50
+
+    raw_chunks: list[str] = []
+    if len(tokens) <= CHUNK_SIZE:
+        raw_chunks = [content]
+    else:
+        start = 0
+        while start < len(tokens):
+            end = min(start + CHUNK_SIZE, len(tokens))
+            raw_chunks.append(enc.decode(tokens[start:end]))
+            if end == len(tokens):
+                break
+            start += CHUNK_SIZE - OVERLAP
+
+    chunks = []
+    for idx, text in enumerate(raw_chunks):
+        if not text.strip():
+            continue
+        chunks.append({
+            "id":                 str(uuid.uuid4()),
+            "content":            text,
+            "content_vector":     [],
+            "document_title":     title,
+            "source_url":         url,
+            "page_number":        None,
+            "slide_number":       None,
+            "content_type":       "text",
+            "customer_tag":       "internal",
+            "author":             author,
+            "created_date":       pub_date,
+            "last_modified_date": pub_date,
+            "chunk_index":        idx,
+            "extracted_caption":  subtitle,
+            "allowed_groups":     ["all"],
+        })
+
+    logger.info("  %d chunks produced from Substack JSON", len(chunks))
+    uploaded = upload_chunks(chunks, dry_run=dry_run)
+    logger.info("  %d chunks [green]uploaded[/green] (%s)", uploaded, "DRY RUN" if dry_run else "LIVE")
+    return uploaded
 
 
 def ingest_file(
@@ -116,57 +179,48 @@ def ingest_file(
     skip_cu: bool = False,
     no_cu: bool = False,
 ) -> int:
-    """
-    Run the full pipeline for a single blob file.
-    Returns number of chunks produced (or would produce in dry-run).
-
-    Extraction modes (pick one):
-      default     — call Azure Content Understanding API (best quality)
-      --skip-cu   — reuse a cached CU result; skip files with no cache
-      --no-cu     — extract text with pypdf (fast, no API cost, PDFs only)
-    """
     file_path = blob_info["file_path"]
-    blob_url = blob_info["blob_url"]
+    blob_url  = blob_info["blob_url"]
 
     logger.info("[bold]Processing[/bold]: %s", file_path)
 
-    # Skip unsupported file types
     ext = file_path.lower().split(".")[-1]
+
+    # JSON = Substack post (pre-scraped, no CU needed)
+    if ext == "json":
+        return _ingest_substack_json(blob_info, dry_run=dry_run)
+
     if ext not in {"pdf", "pptx", "docx", "xlsx", "txt", "md"}:
         logger.warning("Skipping unsupported file type: %s", file_path)
         return 0
 
     try:
-        # Step 1: Extract document content
         if no_cu:
-            # pypdf fallback — no CU API cost, PDFs only
             if ext != "pdf":
                 logger.warning("  --no-cu only supports PDF files — skipping %s", file_path)
                 return 0
-            if not STORAGE_CONNECTION_STRING:
-                raise EnvironmentError("AZURE_STORAGE_CONNECTION_STRING must be set in .env")
             result = extract_text_pypdf(file_path, STORAGE_CONNECTION_STRING, CONTAINER_NAME)
         elif skip_cu and cache_dir:
-            # Load from cache; skip if no cache exists
-            safe_key = file_path.replace("/", "_").replace("\\", "_")
             import pathlib
+            safe_key = file_path.replace("/", "_").replace("\\", "_")
             cache_path = pathlib.Path(cache_dir) / f"{safe_key}.json"
             if not cache_path.exists():
-                logger.warning("  --skip-cu set but no cache for %s — skipping file", file_path)
+                logger.warning("  --skip-cu set but no cache for %s — skipping", file_path)
                 return 0
             result = analyze_document(blob_url, cache_dir=cache_dir, cache_key=file_path)
         else:
             result = analyze_document(blob_url, cache_dir=cache_dir, cache_key=file_path)
-        logger.info("  CU analysis done — %d pages, %d figures", len(result.get("pages", [])), len(result.get("figures", [])))
 
-        # Step 2: Chunk into ContentIQ metadata-rich chunks
+        logger.info("  CU analysis done — %d pages, %d figures",
+                    len(result.get("pages", [])), len(result.get("figures", [])))
+
         blob_metadata = get_blob_metadata(blob_info)
         chunks = chunk_document(result, blob_url, file_path, blob_metadata)
         logger.info("  %d chunks produced", len(chunks))
 
-        # Step 3: Embed + upload
         uploaded = upload_chunks(chunks, dry_run=dry_run)
-        logger.info("  %d chunks [green]uploaded[/green] (%s)", uploaded, "DRY RUN" if dry_run else "LIVE")
+        logger.info("  %d chunks [green]uploaded[/green] (%s)",
+                    uploaded, "DRY RUN" if dry_run else "LIVE")
         return uploaded
 
     except Exception as e:
@@ -176,43 +230,51 @@ def ingest_file(
 
 def main():
     parser = argparse.ArgumentParser(description="ContentIQ Ingestion Pipeline")
-    parser.add_argument("--create-index", action="store_true", help="Create/update the AI Search index schema")
-    parser.add_argument("--dry-run", action="store_true", help="Embed chunks but do NOT upload to AI Search")
-    parser.add_argument("--file", type=str, default=None, help="Ingest only this blob path (e.g. customers/Shell/file.pdf)")
-    parser.add_argument("--cache-dir", type=str, default=".cu_cache", help="Directory for CU output cache (default: .cu_cache)")
-    parser.add_argument("--skip-cu", action="store_true", help="Skip CU API calls — only process files with an existing cache entry. Use for re-chunking without re-analysing.")
-    parser.add_argument("--no-cu", action="store_true", help="Use pypdf for text extraction instead of Azure Content Understanding. Fast and free, but no table/figure/image support. PDFs only.")
+    parser.add_argument("--create-index", action="store_true")
+    parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--file", type=str, default=None)
+    parser.add_argument("--folder", type=str, default=None,
+                        help="Only ingest blobs whose path starts with this prefix (e.g. sandeep-alur/)")
+    parser.add_argument("--cache-dir", type=str, default=".cu_cache")
+    parser.add_argument("--skip-cu", action="store_true")
+    parser.add_argument("--no-cu", action="store_true")
     args = parser.parse_args()
 
     console.rule("[bold blue]ContentIQ Ingestion Pipeline")
 
-    # Create/update index schema
     if args.create_index:
         console.print("[yellow]Creating/verifying AI Search index schema...[/yellow]")
         create_or_update_index()
         console.print("[green]Index ready.[/green]")
+        if not args.file and not args.dry_run and not args.skip_cu and not args.no_cu:
+            return
 
-    # List blobs
     if args.file:
-        # Single-file mode: construct blob info manually
         client = _get_blob_service_client()
         blob_client = client.get_container_client(CONTAINER_NAME).get_blob_client(args.file)
         blobs = [{"file_path": args.file, "blob_url": blob_client.url, "last_modified": None}]
     else:
         console.print("[yellow]Listing blobs in container '%s'...[/yellow]" % CONTAINER_NAME)
         blobs = list_blob_files()
-        console.print(f"[green]Found {len(blobs)} files.[/green]")
+        if args.folder:
+            prefix = args.folder.rstrip("/") + "/"
+            blobs = [b for b in blobs if b["file_path"].startswith(prefix)]
+            console.print(f"[green]Found {len(blobs)} files matching folder '{args.folder}'.[/green]")
+        else:
+            console.print(f"[green]Found {len(blobs)} files.[/green]")
 
     if not blobs:
-        console.print("[yellow]No files to ingest. Upload documents to Blob Storage first.[/yellow]")
+        console.print("[yellow]No files to ingest.[/yellow]")
         return
 
     total_chunks = 0
-    with Progress(SpinnerColumn(), TextColumn("[progress.description]{task.description}"), console=console) as progress:
+    with Progress(SpinnerColumn(), TextColumn("[progress.description]{task.description}"),
+                  console=console) as progress:
         task = progress.add_task("Ingesting...", total=len(blobs))
         for blob_info in blobs:
             progress.update(task, description=f"[cyan]{blob_info['file_path']}[/cyan]")
-            n = ingest_file(blob_info, dry_run=args.dry_run, cache_dir=args.cache_dir, skip_cu=args.skip_cu, no_cu=args.no_cu)
+            n = ingest_file(blob_info, dry_run=args.dry_run, cache_dir=args.cache_dir,
+                            skip_cu=args.skip_cu, no_cu=args.no_cu)
             total_chunks += n
             progress.advance(task)
 
@@ -221,7 +283,8 @@ def main():
     except UnicodeEncodeError:
         print("-" * 80)
     try:
-        console.print(f"[bold green]Done! {total_chunks} chunks {'would be' if args.dry_run else 'were'} uploaded.[/bold green]")
+        console.print(f"[bold green]Done! {total_chunks} chunks "
+                      f"{'would be' if args.dry_run else 'were'} uploaded.[/bold green]")
     except UnicodeEncodeError:
         print(f"Done! {total_chunks} chunks {'would be' if args.dry_run else 'were'} uploaded.")
 

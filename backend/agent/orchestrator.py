@@ -126,6 +126,16 @@ def run(
                 query=expanded_query,
                 metadata_filters=metadata_filters,
             )
+            # Follow-up queries still need a confidence check — low-quality
+            # expanded-query results should fall back to web just like fresh ones.
+            if not confidence_evaluate(chunks, query_entities=entities):
+                logger.info("Follow-up confidence LOW — requesting one-time web search permission.")
+                return {
+                    "answer": "",
+                    "citations": [],
+                    "source_label": "INTERNAL",
+                    "needs_web_permission": True,
+                }
             source_label = "INTERNAL"
 
         else:
@@ -213,10 +223,6 @@ def _build_search_query(user_message: str, parsed: dict[str, Any]) -> str:
     Always uses the full user message as the base (preserves semantic richness
     for vector search). Prepends the customer name as a keyword boost only when
     it isn't already present in the message text.
-
-    Previously this replaced the full message with just "customer topic", which
-    discarded critical query terms — e.g. "AI adoption and business impact" —
-    that are the exact headings of relevant document sections.
     """
     customer = (parsed.get("entities") or {}).get("customer") or ""
 

@@ -9,6 +9,8 @@ import uuid
 from contextlib import asynccontextmanager
 from typing import Any
 
+import sdk_patch  # noqa: F401 — must be early; patches azure-core + httpx timeouts
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field

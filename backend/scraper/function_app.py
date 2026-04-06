@@ -1,6 +1,11 @@
 """
 ContentIQ — Azure Function: Timer Trigger
 Fires every Monday at 9:00 AM (UTC) and runs the Substack scraper.
+
+DEPLOYED TO AZURE: This file is the entry point that Azure Functions reads on deployment.
+Azure scans it for trigger decorators (@app.timer_trigger), registers the function by its
+Python name (substack_weekly_ingest), and fires it on the defined cron schedule automatically.
+Without this file, Azure would have no instructions on when or what to run.
 """
 
 import azure.functions as func
