@@ -39,12 +39,13 @@ from uploader import upload_chunks     # scraper/uploader.py
 load_dotenv()  # loads .env locally; in Azure env vars come from App Settings
 
 SUBSTACK_BASE          = "https://sandeepalur.substack.com"
-SUBSTACK_API_URL       = f"{SUBSTACK_BASE}/api/v1/posts"
+SUBSTACK_RSS_URL       = f"{SUBSTACK_BASE}/feed"
 SUBSTACK_API_SLUG_URL  = f"{SUBSTACK_BASE}/api/v1/posts/by-slug"   # fallback per-post
+RSS2JSON_API           = "https://api.rss2json.com/v1/api.json"     # proxy — avoids Azure IP block
 
 BLOB_CONNECTION_STR  = os.getenv("AZURE_STORAGE_CONNECTION_STRING", "")
 BLOB_CONTAINER       = os.getenv("RAW_DOCUMENT_CONTAINER", "container")
-BLOB_PREFIX          = "internal/sandeep-alur"
+BLOB_PREFIX          = "sandeep-alur"
 STATE_BLOB_PATH      = f"{BLOB_PREFIX}/state.json"
 LOG_BLOB_PATH        = f"{BLOB_PREFIX}/run_log.json"
 
@@ -109,46 +110,59 @@ def _clean_title(title: str) -> str:
     return title
 
 
+# ── Date normalisation ───────────────────────────────────────────────────────
+
+def _parse_date(date_str: str, fallback: str) -> str:
+    """
+    Convert any date string to ISO 8601 with UTC timezone (Edm.DateTimeOffset).
+    rss2json returns dates as "2026-04-13 01:01:17" (space, no tz) which Azure
+    AI Search rejects. This converts them to "2026-04-13T01:01:17+00:00".
+    """
+    if not date_str:
+        return fallback
+    try:
+        dt = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+        return dt.replace(tzinfo=timezone.utc).isoformat()
+    except ValueError:
+        pass
+    return date_str  # already ISO format, return as-is
+
+
 # ── Substack API + scraping ───────────────────────────────────────────────────
 
 def fetch_all_posts() -> list[dict]:
     """
-    Fetch EVERY post using Substack's public paginated API.
-    No API key required — same endpoint the Substack frontend uses.
-    Paginates in batches of 12 until an empty response is returned.
+    Fetch all posts via rss2json.com, which proxies the Substack RSS feed.
+    Direct requests to sandeepalur.substack.com are blocked from Azure datacenter IPs
+    by Cloudflare — routing through rss2json bypasses this.
     Returns list of dicts: { title, url, slug, published_date, subtitle }
     """
-    logger.info("Fetching all posts via Substack API (paginated)...")
-    all_posts: list[dict] = []
-    offset = 0
-    limit  = 12
+    logger.info("Fetching all posts via rss2json proxy...")
 
     with httpx.Client(timeout=30, follow_redirects=True) as client:
-        while True:
-            resp = client.get(
-                SUBSTACK_API_URL,
-                params={"limit": limit, "offset": offset},
-                headers={"User-Agent": "Mozilla/5.0 (ContentIQ bot)"},
-            )
-            resp.raise_for_status()
-            batch = resp.json()
+        resp = client.get(RSS2JSON_API, params={"rss_url": SUBSTACK_RSS_URL})
+        resp.raise_for_status()
 
-            if not batch:
-                break  # no more posts
+    data = resp.json()
+    if data.get("status") != "ok":
+        raise ValueError(f"rss2json error: {data.get('message', 'unknown')}")
 
-            for post in batch:
-                slug          = post.get("slug", "")
-                canonical_url = post.get("canonical_url", f"{SUBSTACK_BASE}/p/{slug}")
-                all_posts.append({
-                    "title"          : _clean_title(post.get("title", "Untitled")),
-                    "url"            : canonical_url.rstrip("/"),
-                    "slug"           : slug,
-                    "published_date" : post.get("post_date", ""),
-                    "subtitle"       : (post.get("subtitle") or "")[:300],
-                })
-
-            logger.info("  %d post(s) fetched so far (offset=%d)...", len(all_posts), offset)
-            offset += limit
+    all_posts: list[dict] = []
+    for item in data.get("items", []):
+        url  = (item.get("link") or "").rstrip("/")
+        slug = url.split("/p/")[-1] if "/p/" in url else ""
+        desc = BeautifulSoup(item.get("description") or "", "html.parser").get_text(strip=True)[:300]
+        # rss2json returns full article HTML in 'content' — extract plain text here
+        raw_content = BeautifulSoup(item.get("content") or "", "html.parser").get_text(separator="\n", strip=True)
+        if url:
+            all_posts.append({
+                "title"          : _clean_title(item.get("title") or "Untitled"),
+                "url"            : url,
+                "slug"           : slug,
+                "published_date" : item.get("pubDate") or "",
+                "subtitle"       : desc,
+                "content"        : raw_content,   # pre-fetched — no HTML scraping needed
+            })
 
     logger.info("Total posts discovered: %d", len(all_posts))
     return all_posts
@@ -161,7 +175,7 @@ def _scrape_html(url: str) -> tuple[str, str]:
     """
     try:
         with httpx.Client(timeout=30, follow_redirects=True) as client:
-            resp = client.get(url, headers={"User-Agent": "Mozilla/5.0 (ContentIQ bot)"})
+            resp = client.get(url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"})
             resp.raise_for_status()
 
         soup = BeautifulSoup(resp.text, "html.parser")
@@ -200,7 +214,7 @@ def _fetch_via_api(slug: str) -> tuple[str, str]:
     try:
         url = f"{SUBSTACK_API_SLUG_URL}/{slug}"
         with httpx.Client(timeout=30, follow_redirects=True) as client:
-            resp = client.get(url, headers={"User-Agent": "Mozilla/5.0 (ContentIQ bot)"})
+            resp = client.get(url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"})
             resp.raise_for_status()
 
         data      = resp.json()
@@ -277,8 +291,8 @@ def chunk_post(post: dict) -> list[dict]:
             "content_type"       : "text",
             "customer_tag"       : "internal",
             "author"             : "Sandeep Alur",
-            "created_date"       : post.get("published_date") or now,
-            "last_modified_date" : post.get("published_date") or now,
+            "created_date"       : _parse_date(post.get("published_date") or "", now),
+            "last_modified_date" : _parse_date(post.get("published_date") or "", now),
             "chunk_index"        : idx,
             "extracted_caption"  : post.get("subtitle", ""),
             "allowed_groups"     : ["all"],
@@ -330,8 +344,13 @@ def run(dry_run: bool = False, reset: bool = False) -> None:
     for post_meta in new_posts:
         logger.info("[bold]→[/bold] %s", post_meta["title"])
 
-        # ── Fetch content (HTML → API fallback) ───────────────────────────────
-        content, failure_reason = get_post_content(post_meta["url"], post_meta["slug"])
+        # ── Get content (from rss2json if available, else HTML scrape fallback) ──
+        content = post_meta.get("content", "").strip()
+        if content:
+            logger.info("  Content sourced from rss2json (%d words)", len(content.split()))
+        else:
+            logger.info("  rss2json had no content — falling back to HTML scrape...")
+            content, failure_reason = get_post_content(post_meta["url"], post_meta["slug"])
 
         if not content:
             logger.warning("  [red]Skipped — %s[/red]", failure_reason)

@@ -57,3 +57,6 @@ scratch/
 
 # Azure Content Understanding cache
 backend/.cu_cache/
+
+# Azure Functions local dev settings (contains local-only storage config)
+local.settings.json
