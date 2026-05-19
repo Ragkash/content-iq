@@ -17,6 +17,7 @@ Built for consulting firms that need to surface knowledge locked inside PDFs, Wo
 - **Metadata-aware filtering** — query parser extracts customer names, topics, and time constraints; AI Search applies OData filters automatically.
 - **Customer tagging** — blob folder path (`customers/Shell/`) is used at ingestion time to tag every chunk with `customer_tag`, enabling precise per-client scoping.
 - **Fluent UI chat interface** — Copilot-inspired chat UI with citation cards, source badges, and a web search toggle.
+- **Automated Substack ingestion** — weekly Azure Function scrapes `sandeepalur.substack.com`, chunks each post, and upserts it into the same AI Search index so thought leadership content stays current automatically.
 
 ---
 
@@ -107,28 +108,100 @@ Internal results returned
 
 ---
 
-## Data Sources
+## Substack Scraper & Weekly Cron Job
 
-| Source | Status | Notes |
-|---|---|---|
-| Azure Blob Storage | v1 (live) | PDFs, DOCX, PPTX under `documents/` container |
-| SharePoint (MS Graph) | v2 (planned) | Per-user RBAC via Azure AD |
-| Tavily Web Search | v1 (live) | Fallback only, consent-gated |
+Content IQ automatically ingests posts from `sandeepalur.substack.com` on a weekly schedule using an Azure Functions timer trigger. This keeps the AI Search index fresh with new thought leadership without any manual steps.
 
-### Blob Folder Convention
+### How it works
 
 ```
-documents/
-  customers/
-    Shell/       ← customer_tag = "Shell"
-    IndiGo/      ← customer_tag = "IndiGo"
-    Air India/   ← customer_tag = "Air India"
-    BP/          ← customer_tag = "BP"
-  internal/
-    general/     ← customer_tag = "internal"
+rss2json proxy  ──►  fetch_all_posts()
+(bypasses Cloudflare      pulls title, URL, published_date,
+ on Azure datacenter IPs)  and full article text from RSS feed
+       │
+       ▼
+  new posts only  ──►  state.json in Blob Storage tracks
+                        which URLs have already been indexed
+       │
+       ▼
+  chunk_post()   ──►  500-token chunks, 50-token overlap
+                       same metadata schema as PDF/PPTX chunks
+                       customer_tag = "internal"
+                       author = "Sandeep Alur"
+                       source_url = live Substack post URL (direct citation)
+       │
+       ├──►  save {slug}.json to Blob Storage  (audit trail)
+       │
+       └──►  embed_batch() + upload_chunks()  → Azure AI Search
 ```
 
-The ingestion pipeline reads the folder path and stamps every chunk with `customer_tag` automatically — no manual metadata required.
+**Fallback chain for content extraction:**
+1. `rss2json` response includes full article HTML — parsed to plain text directly.
+2. If empty: HTML scrape of the live post page (`div.body.markup`, `div.post-content`, `article`).
+3. If blocked: Substack per-slug API endpoint (`/api/v1/posts/by-slug/{slug}`).
+
+### Azure Function timer trigger
+
+The scraper is deployed as an Azure Function (`backend/scraper/function_app.py`). Azure reads the `@app.timer_trigger` decorator and fires it automatically — no external scheduler needed.
+
+```python
+@app.timer_trigger(
+    schedule="0 0 9 * * 1",   # every Monday at 09:00 UTC
+    arg_name="timer",
+    run_on_startup=False,
+    use_monitor=True,
+)
+def substack_weekly_ingest(timer: func.TimerRequest) -> None:
+    run(dry_run=False, reset=False)
+```
+
+**Cron expression breakdown:** `0 0 9 * * 1` → second=0, minute=0, hour=9, any day-of-month, any month, Monday only.
+
+### Scraper files
+
+```
+backend/scraper/
+├── function_app.py       ← Azure Function entry point (timer trigger)
+├── substack_scraper.py   ← scrape → chunk → embed → upload pipeline
+├── embedder.py           ← copy of ingestion/embedder.py for standalone deploy
+├── uploader.py           ← copy of ingestion/uploader.py for standalone deploy
+├── host.json             ← Azure Functions runtime config (v2, extension bundle 4.x)
+├── local.settings.json   ← local dev env vars (not committed)
+└── requirements.txt      ← Azure Oryx build dependencies
+```
+
+### Running locally
+
+```bash
+cd backend/scraper
+pip install -r requirements.txt
+
+# Ingest all new posts (skips already-indexed URLs via state.json):
+python substack_scraper.py
+
+# Dry run — saves JSONs to Blob but skips AI Search upload:
+python substack_scraper.py --dry-run
+
+# Full reset — clears state and reingests every post from scratch:
+python substack_scraper.py --reset
+```
+
+### Blob Storage layout (scraper)
+
+```
+<RAW_DOCUMENT_CONTAINER>/
+  sandeep-alur/
+    state.json           ← list of already-indexed post URLs + last_run timestamp
+    run_log.json         ← last run stats (posts discovered, ingested, skipped, chunks)
+    {slug}.json          ← raw scraped post data (title, content, word_count, scraped_at)
+```
+
+### Additional env vars (scraper only)
+
+| Variable | Description |
+|---|---|
+| `AZURE_STORAGE_CONNECTION_STRING` | Blob Storage connection string (scraper uses this instead of account name) |
+| `RAW_DOCUMENT_CONTAINER` | Container for scraped JSON files (default: `container`) |
 
 ---
 
@@ -156,13 +229,21 @@ content-iq/
 │   │   ├── synthesiser.py        ← grounded LLM synthesis + citation builder
 │   │   ├── session.py            ← in-memory conversation store
 │   │   └── groq_client.py        ← Groq client with 3-key round-robin
-│   └── ingestion/
-│       ├── ingest_all.py         ← CLI orchestrator (entry point)
-│       ├── analyzer.py           ← Azure Content Understanding REST wrapper
-│       ├── chunker.py            ← token-based chunker + metadata tagger
-│       ├── embedder.py           ← ADA-002 embeddings, batch + retry
-│       ├── indexer.py            ← AI Search index schema creator
-│       └── uploader.py           ← batch embed + upload to index
+│   ├── ingestion/
+│   │   ├── ingest_all.py         ← CLI orchestrator (entry point)
+│   │   ├── analyzer.py           ← Azure Content Understanding REST wrapper
+│   │   ├── chunker.py            ← token-based chunker + metadata tagger
+│   │   ├── embedder.py           ← ADA-002 embeddings, batch + retry
+│   │   ├── indexer.py            ← AI Search index schema creator
+│   │   └── uploader.py           ← batch embed + upload to index
+│   └── scraper/
+│       ├── function_app.py       ← Azure Function timer trigger (every Monday 09:00 UTC)
+│       ├── substack_scraper.py   ← scrape → chunk → embed → upload pipeline
+│       ├── embedder.py           ← standalone copy for Azure deployment
+│       ├── uploader.py           ← standalone copy for Azure deployment
+│       ├── host.json             ← Azure Functions runtime config
+│       ├── local.settings.json   ← local dev env vars (not committed)
+│       └── requirements.txt      ← Azure Oryx build dependencies
 └── frontend/
     ├── package.json
     ├── vite.config.ts
@@ -293,12 +374,14 @@ Copy `.env.example` to `.env` in the project root and fill in the values below.
 | `AZURE_CU_ENDPOINT` | Content Understanding endpoint |
 | `AZURE_CU_KEY` | Content Understanding API key |
 
-### Azure Blob Storage (ingestion only)
+### Azure Blob Storage
 
 | Variable | Description |
 |---|---|
-| `AZURE_STORAGE_ACCOUNT_NAME` | Storage account name |
-| `AZURE_STORAGE_CONTAINER` | Container name (default: `documents`) |
+| `AZURE_STORAGE_ACCOUNT_NAME` | Storage account name (used by ingestion pipeline) |
+| `AZURE_STORAGE_CONTAINER` | Container for ingested documents (default: `documents`) |
+| `AZURE_STORAGE_CONNECTION_STRING` | Connection string used by the Substack scraper |
+| `RAW_DOCUMENT_CONTAINER` | Container for scraped Substack JSON files (default: `container`) |
 
 ### Groq (LLM — query parsing + synthesis)
 
@@ -413,6 +496,7 @@ curl -X POST http://localhost:8000/chat \
 | Document extraction | Azure Content Understanding (prebuilt-layout) |
 | Blob storage | Azure Blob Storage |
 | Web fallback | Tavily Search API |
+| Substack scraper | Azure Functions (Python v2, timer trigger), rss2json proxy, BeautifulSoup |
 | Backend | Python 3.11, FastAPI, uvicorn |
 | Frontend | React 19, TypeScript, Vite, Fluent UI v9 |
 
